@@ -17,7 +17,7 @@ namespace BangazonAPI.Models
         [Required]
         [StringLength(55)]
         public string LastName { get; set; }
-        public int Supervisor { get; set; } = 0;
+        //public int Supervisor { get; set; } = 0;
         Department Department { get; set; }
         Computer Computer { get; set; }
 
