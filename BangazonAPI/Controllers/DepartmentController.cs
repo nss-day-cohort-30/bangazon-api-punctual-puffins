@@ -94,12 +94,14 @@ namespace BangazonAPI.Controllers
         [HttpGet("{id}", Name = "GetDepartment")]
         public async Task<IActionResult> Get(int id)
         {
-            using (SqlConnection conn = Connection)
+            if (DepartmentExists(id))
             {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
+                using (SqlConnection conn = Connection)
                 {
-                    cmd.CommandText = @"SELECT d.Id, 
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"SELECT d.Id, 
                                            d.Name, 
                                             d.Budget, 
                                             e.Id empId,
@@ -109,44 +111,50 @@ namespace BangazonAPI.Controllers
                                         FROM Department d LEFT JOIN Employee e
                                         ON d.Id = e.DepartmentId
                                         WHERE d.Id = @id";
-                    cmd.Parameters.Add(new SqlParameter("@id", id));
-                    SqlDataReader reader = await cmd.ExecuteReaderAsync();
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
+                        SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
-                    Department department = null;
-                    Dictionary<int, Department> HashTable = new Dictionary<int, Department>();
-                    while (reader.Read())
-                    {
-                        int DeptId = reader.GetInt32(reader.GetOrdinal("Id"));
-                        if (!HashTable.ContainsKey(DeptId))
+                        Department department = null;
+                        Dictionary<int, Department> HashTable = new Dictionary<int, Department>();
+                        while (reader.Read())
                         {
-                            Department dept = new Department
+                            int DeptId = reader.GetInt32(reader.GetOrdinal("Id"));
+                            if (!HashTable.ContainsKey(DeptId))
                             {
-                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                                Name = reader.GetString(reader.GetOrdinal("Name")),
-                                Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
-                                // You might have more columns
+                                Department dept = new Department
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    Name = reader.GetString(reader.GetOrdinal("Name")),
+                                    Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
+                                    // You might have more columns
+                                };
+                                HashTable[DeptId] = dept;
                             };
-                            HashTable[DeptId] = dept;
-                        };
-                        if (!reader.IsDBNull(reader.GetOrdinal("empId")))
+                            if (!reader.IsDBNull(reader.GetOrdinal("empId")))
                             {
-                            Employee employee = new Employee
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("empId")),
-                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                                LastName = reader.GetString(reader.GetOrdinal("LastName"))
-                                //Supervisor = reader.GetInt32(reader.GetOrdinal("Supervisor"))
-                            };
-                            HashTable[DeptId].Employees.Add(employee);
+                                Employee employee = new Employee
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("empId")),
+                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                    LastName = reader.GetString(reader.GetOrdinal("LastName"))
+                                    //Supervisor = reader.GetInt32(reader.GetOrdinal("Supervisor"))
+                                };
+                                HashTable[DeptId].Employees.Add(employee);
+                            }
                         }
+
+                        reader.Close();
+                        department = HashTable[id];
+
+                        return Ok(department);
                     }
-
-                    reader.Close();
-                    department = HashTable[id];
-
-                    return Ok(department);
                 }
             }
+            else
+            {
+                return new StatusCodeResult(StatusCodes.Status404NotFound);
+            }
+            
         }
         // POST api/values
         [HttpPost]
@@ -192,6 +200,7 @@ namespace BangazonAPI.Controllers
                         ";
                         cmd.Parameters.Add(new SqlParameter("@name", department.Name));
                         cmd.Parameters.Add(new SqlParameter("@budget", department.Budget));
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
 
                         int rowsAffected = await cmd.ExecuteNonQueryAsync();
 
@@ -216,6 +225,35 @@ namespace BangazonAPI.Controllers
                 }
             }
         }
+        
+        //DELETE api/values/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+  
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                        DELETE FROM Department
+                        WHERE Id = @id
+                    ";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                    int rowsAffected = await cmd.ExecuteNonQueryAsync();
+
+                    if (rowsAffected > 0)
+                    {
+                        return new StatusCodeResult(StatusCodes.Status204NoContent);
+                    }
+
+                    throw new Exception("No rows affected");
+                }
+            }
+        }
+
         private bool DepartmentExists(int id)
         {
             using (SqlConnection conn = Connection)
@@ -224,7 +262,7 @@ namespace BangazonAPI.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     // More string interpolation
-                    cmd.CommandText = "SELECT Id FROM Customer WHERE Id = @id";
+                    cmd.CommandText = "SELECT Id FROM Department WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
 
                     SqlDataReader reader = cmd.ExecuteReader();
@@ -233,6 +271,5 @@ namespace BangazonAPI.Controllers
                 }
             }
         }
-
     }
 }
