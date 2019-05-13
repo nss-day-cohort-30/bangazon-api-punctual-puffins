@@ -75,8 +75,8 @@ namespace BangazonAPI.Controllers
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("empId")),
                                 FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                                LastName = reader.GetString(reader.GetOrdinal("LastName"))
-                                //Supervisor = reader.GetInt32(reader.GetOrdinal("Supervisor"))
+                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                Supervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor"))
                             };
                             HashTable[DeptId].Employees.Add(employee);
                         }
@@ -137,7 +137,6 @@ namespace BangazonAPI.Controllers
                                     Id = reader.GetInt32(reader.GetOrdinal("empId")),
                                     FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                                     LastName = reader.GetString(reader.GetOrdinal("LastName"))
-                                    //Supervisor = reader.GetInt32(reader.GetOrdinal("Supervisor"))
                                 };
                                 HashTable[DeptId].Employees.Add(employee);
                             }
@@ -167,9 +166,9 @@ namespace BangazonAPI.Controllers
                 {
                     // More string interpolation
                     cmd.CommandText = @"
-                        INSERT INTO Department ([Name], Budget) 
+                        INSERT INTO Department ([Name], Budget, IsSupervisor) 
                         OUTPUT INSERTED.Id
-                        VALUES (@name, @budget)
+                        VALUES (@name, @budget, @isSupervisor)
                     ";
                     cmd.Parameters.Add(new SqlParameter("@name", department.Name));
                     cmd.Parameters.Add(new SqlParameter("@budget", department.Budget));
@@ -217,7 +216,7 @@ namespace BangazonAPI.Controllers
             {
                 if (!DepartmentExists(id))
                 {
-                    return NotFound();
+                    return new StatusCodeResult(StatusCodes.Status404NotFound);
                 }
                 else
                 {
@@ -230,28 +229,42 @@ namespace BangazonAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-  
-            using (SqlConnection conn = Connection)
+            try
             {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
+                using (SqlConnection conn = Connection)
                 {
-                    cmd.CommandText = @"
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"
                         DELETE FROM Department
                         WHERE Id = @id
                     ";
-                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
 
-                    int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                        int rowsAffected = await cmd.ExecuteNonQueryAsync();
 
-                    if (rowsAffected > 0)
-                    {
-                        return new StatusCodeResult(StatusCodes.Status204NoContent);
+                        if (rowsAffected > 0)
+                        {
+                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                        }
+
+                        throw new Exception("No rows affected");
                     }
-
-                    throw new Exception("No rows affected");
                 }
             }
+            catch (Exception)
+            {
+                if (!DepartmentExists(id))
+                {
+                    return new StatusCodeResult(StatusCodes.Status404NotFound);
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        
         }
 
         private bool DepartmentExists(int id)
