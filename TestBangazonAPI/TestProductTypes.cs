@@ -141,40 +141,30 @@ namespace TestBangazonAPI
                 Assert.Equal(HttpStatusCode.NoContent, newResponse.StatusCode);
             }
         }
-        //[Fact]
-        //public async Task Test_Edit_One_ProductType()
-        //{
-        //    using (var client = new APIClientProvider().Client)
-        //    {
-        //        /*
-        //            ARRANGE
-        //        */
-        //        ProductType newProduct = new ProductType
-        //        {
-        //            Name = "Thundershirt"
-        //        };
-
-        //        var newProductAsJSON = JsonConvert.SerializeObject(newProduct);
-        //        /*
-        //            ACT
-        //        */
-        //        var response = await client.PutAsync($"/api/producttype/2", 
-        //            new StringContent(newProductAsJSON, Encoding.UTF8, "application/json"));
+        [Fact]
+        public async Task Test_Get_One_False_ProductType()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                /*
+                    ARRANGE
+                */
 
 
-        //        string responseBody = await response.Content.ReadAsStringAsync();
+                /*
+                    ACT
+                */
+                var response = await client.GetAsync($"/api/producttype/1000");
 
-        //        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-        //       var getThundershirt = await client.GetAsync("/api/producttype/2");
-        //        getThundershirt.EnsureSuccessStatusCode();
+                string responseBody = await response.Content.ReadAsStringAsync();
+                var productType = JsonConvert.DeserializeObject<ProductType>(responseBody);
 
-        //        string getThundershirtBody = await getThundershirt.Content.ReadAsStringAsync();
-        //        ProductType newThundershirt = JsonConvert.DeserializeObject<ProductType>(getThundershirtBody);
-
-        //        Assert.Equal(HttpStatusCode.OK, getThundershirt.StatusCode);
-        //        Assert.Equal("Thundershirt", newThundershirt.Name);
-    //}
-//}
+                /*
+                    ASSERT
+                */
+                Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+            }
+        }
     }
 }

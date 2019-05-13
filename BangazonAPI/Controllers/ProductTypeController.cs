@@ -66,30 +66,37 @@ namespace BangazonAPI.Controllers
         [HttpGet("{id}", Name = "GetProductType")]
         public async Task<IActionResult> Get(int id)
         {
-            using (SqlConnection conn = Connection)
+            try
             {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
+                using (SqlConnection conn = Connection)
                 {
-                    cmd.CommandText = "SELECT Id, Name FROM ProductType WHERE @id = ProductType.Id";
-                    cmd.Parameters.Add(new SqlParameter("@id", id));
-                    SqlDataReader reader = await cmd.ExecuteReaderAsync();
-
-                    ProductType productType = null;
-                    if (reader.Read())
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        productType = new ProductType
+                        cmd.CommandText = "SELECT Id, Name FROM ProductType WHERE @id = ProductType.Id";
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
+                        SqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+                        ProductType productType = null;
+                        if (reader.Read())
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Name = reader.GetString(reader.GetOrdinal("Name")),
-                            // You might have more columns
-                        };
+                            productType = new ProductType
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                                // You might have more columns
+                            };
+                        }
+
+                        reader.Close();
+
+                        return Ok(productType);
                     }
-
-                    reader.Close();
-
-                    return Ok(productType);
                 }
+            }
+            catch
+            {
+                return new StatusCodeResult(StatusCodes.Status204NoContent);
             }
         }
 
@@ -110,7 +117,7 @@ namespace BangazonAPI.Controllers
                     ";
                     cmd.Parameters.Add(new SqlParameter("@name", productType.Name));
 
-                    int newId = (int) await cmd.ExecuteScalarAsync();
+                    int newId = (int)await cmd.ExecuteScalarAsync();
 
                     productType.Id = newId;
 

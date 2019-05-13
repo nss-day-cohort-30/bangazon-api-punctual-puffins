@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -51,11 +51,11 @@ namespace BangazonAPI.Controllers
                             Title = reader.GetString(reader.GetOrdinal("Title")),
                             Price = reader.GetString(reader.GetOrdinal("Price")),
                             Description = reader.GetString(reader.GetOrdinal("Description")),
-                           Quantity = reader.GetString(reader.GetOrdinal("Quantity"))
-                          
-    };
+                            Quantity = reader.GetString(reader.GetOrdinal("Quantity"))
 
-                       products.Add(product);
+                        };
+
+                        products.Add(product);
                     }
 
                     reader.Close();
@@ -114,7 +114,7 @@ namespace BangazonAPI.Controllers
                     ";
                     cmd.Parameters.Add(new SqlParameter("@firstName", customer.FirstName));
 
-                    customer.Id = (int) await cmd.ExecuteScalarAsync();
+                    customer.Id = (int)await cmd.ExecuteScalarAsync();
 
                     return CreatedAtRoute("GetCustomer", new { id = customer.Id }, customer);
                 }
