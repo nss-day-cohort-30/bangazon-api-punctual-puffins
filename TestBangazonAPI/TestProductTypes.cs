@@ -65,7 +65,7 @@ namespace TestBangazonAPI
             }
         }
         [Fact]
-        public async Task Test_Create_And_Delete_One_ProductType()
+        public async Task Test_Create_Update_And_Delete_One_ProductType()
         {
             using (var client = new APIClientProvider().Client)
             {
@@ -93,8 +93,39 @@ namespace TestBangazonAPI
                 */
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
                 Assert.Matches(newProductType.Name, "Thundershirt");
-            
-            
+
+                /* UPDATE CREATION */
+                /*
+                   ARRANGE
+               */
+                ProductType updateProduct = new ProductType
+                {
+                    Name = "Dog Socks"
+                };
+
+                var updateProductAsJSON = JsonConvert.SerializeObject(updateProduct);
+                /*
+                    ACT
+                */
+                var updateResponse = await client.PutAsync($"/api/producttype/{newProductType.Id}",
+                    new StringContent(updateProductAsJSON, Encoding.UTF8, "application/json"));
+
+
+                string updateResponseBody = await updateResponse.Content.ReadAsStringAsync();
+
+                Assert.Equal(HttpStatusCode.NoContent, updateResponse.StatusCode);
+
+                var getDogSocks = await client.GetAsync($"/api/producttype/{newProductType.Id}");
+                getDogSocks.EnsureSuccessStatusCode();
+
+                string getDogSocksBody = await getDogSocks.Content.ReadAsStringAsync();
+                ProductType newDogSocks = JsonConvert.DeserializeObject<ProductType>(getDogSocksBody);
+
+                Assert.Equal(HttpStatusCode.OK, getDogSocks.StatusCode);
+                Assert.Equal("Dog Socks", newDogSocks.Name);
+
+
+                /* DELETE CREATION*/
                 /*
                     ARRANGE
                 */
@@ -110,40 +141,40 @@ namespace TestBangazonAPI
                 Assert.Equal(HttpStatusCode.NoContent, newResponse.StatusCode);
             }
         }
-        [Fact]
-        public async Task Test_Edit_One_ProductType()
-        {
-            using (var client = new APIClientProvider().Client)
-            {
-                /*
-                    ARRANGE
-                */
-                ProductType newProduct = new ProductType
-                {
-                    Name = "Thundershirt"
-                };
+        //[Fact]
+        //public async Task Test_Edit_One_ProductType()
+        //{
+        //    using (var client = new APIClientProvider().Client)
+        //    {
+        //        /*
+        //            ARRANGE
+        //        */
+        //        ProductType newProduct = new ProductType
+        //        {
+        //            Name = "Thundershirt"
+        //        };
 
-                var newProductAsJSON = JsonConvert.SerializeObject(newProduct);
-                /*
-                    ACT
-                */
-                var response = await client.PutAsync($"/api/producttype/2", 
-                    new StringContent(newProductAsJSON, Encoding.UTF8, "application/json"));
+        //        var newProductAsJSON = JsonConvert.SerializeObject(newProduct);
+        //        /*
+        //            ACT
+        //        */
+        //        var response = await client.PutAsync($"/api/producttype/2", 
+        //            new StringContent(newProductAsJSON, Encoding.UTF8, "application/json"));
 
 
-                string responseBody = await response.Content.ReadAsStringAsync();
+        //        string responseBody = await response.Content.ReadAsStringAsync();
 
-                Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        //        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-               var getThundershirt = await client.GetAsync("/api/producttype/2");
-                getThundershirt.EnsureSuccessStatusCode();
+        //       var getThundershirt = await client.GetAsync("/api/producttype/2");
+        //        getThundershirt.EnsureSuccessStatusCode();
 
-                string getThundershirtBody = await getThundershirt.Content.ReadAsStringAsync();
-                ProductType newThundershirt = JsonConvert.DeserializeObject<ProductType>(getThundershirtBody);
+        //        string getThundershirtBody = await getThundershirt.Content.ReadAsStringAsync();
+        //        ProductType newThundershirt = JsonConvert.DeserializeObject<ProductType>(getThundershirtBody);
 
-                Assert.Equal(HttpStatusCode.OK, getThundershirt.StatusCode);
-                Assert.Equal("Thundershirt", newThundershirt.Name);
-            }
-        }
+        //        Assert.Equal(HttpStatusCode.OK, getThundershirt.StatusCode);
+        //        Assert.Equal("Thundershirt", newThundershirt.Name);
+    //}
+//}
     }
 }
