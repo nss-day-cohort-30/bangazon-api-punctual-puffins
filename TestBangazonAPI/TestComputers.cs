@@ -17,7 +17,7 @@ namespace TestBangazonAPI
         {
             using (var client = new APIClientProvider().Client)
             {
-                
+
                 var response = await client.GetAsync("/api/computers");
 
 
