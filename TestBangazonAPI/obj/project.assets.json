@@ -10724,7 +10724,6 @@
       "Microsoft.AspNetCore.Mvc.Testing >= 2.2.0",
       "Microsoft.NET.Test.Sdk >= 15.9.0",
       "Microsoft.NETCore.App >= 2.1.0",
-      "System.Data.SqlClient >= 4.6.0",
       "xunit >= 2.4.0",
       "xunit.runner.visualstudio >= 2.4.0"
     ]
@@ -10799,10 +10798,6 @@
             "target": "Package",
             "version": "[2.1.0, )",
             "autoReferenced": true
-          },
-          "System.Data.SqlClient": {
-            "target": "Package",
-            "version": "[4.6.0, )"
           },
           "xunit": {
             "target": "Package",
