@@ -17,7 +17,7 @@ namespace BangazonAPI.Controllers
     {
         private readonly IConfiguration _config;
 
-        public CustomersController(IConfiguration config)
+        public ProductController(IConfiguration config)
         {
             _config = config;
         }
@@ -45,13 +45,13 @@ namespace BangazonAPI.Controllers
                     List<Product> products = new List<Product>();
                     while (reader.Read())
                     {
-                        Prodcuct product = new Product
+                        Product product = new Product
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             Title = reader.GetString(reader.GetOrdinal("Title")),
-                            Price = reader.GetString(reader.GetOrdinal("Price")),
+                            Price = reader.GetDecimal(reader.GetOrdinal("Price")),
                             Description = reader.GetString(reader.GetOrdinal("Description")),
-                           Quantity = reader.GetString(reader.GetOrdinal("Quantity"))
+                           Quantity = reader.GetInt32(reader.GetOrdinal("Quantity"))
                           
     };
 
@@ -74,56 +74,61 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = "Write your SQL statement here to get a single customer";
+                    cmd.CommandText = @"SELECT Id, Title, Price, Description, Quantity FROM Product WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
-                    Customer customer = null;
+                    Product product = null;
                     if (reader.Read())
                     {
-                        customer = new Customer
+                        product = new Product
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                            // You might have more columns
+                            Title = reader.GetString(reader.GetOrdinal("Title")),
+                            Price = reader.GetDecimal(reader.GetOrdinal("Price")),
+                            Description = reader.GetString(reader.GetOrdinal("Description")),
+                            Quantity = reader.GetInt32(reader.GetOrdinal("Quantity"))
                         };
                     }
 
                     reader.Close();
 
-                    return Ok(customer);
+                    return Ok(product);
                 }
             }
         }
 
         // POST api/values
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Customer customer)
+        public async Task<IActionResult> Post([FromBody] Product product)
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    // More string interpolation
+                    
                     cmd.CommandText = @"
-                        INSERT INTO Customer ()
+                        INSERT INTO Product (Title, Price, Description, Quantity)
                         OUTPUT INSERTED.Id
-                        VALUES ()
+                        VALUES ('@title', '@price', '@description', '@quantity')
                     ";
-                    cmd.Parameters.Add(new SqlParameter("@firstName", customer.FirstName));
 
-                    customer.Id = (int) await cmd.ExecuteScalarAsync();
+                    cmd.Parameters.Add(new SqlParameter("@title", product.Title));
+                    cmd.Parameters.Add(new SqlParameter("@price", product.Price));
+                    cmd.Parameters.Add(new SqlParameter("@description", product.Description));
+                    cmd.Parameters.Add(new SqlParameter("@quantity", product.Quantity));
 
-                    return CreatedAtRoute("GetCustomer", new { id = customer.Id }, customer);
+                    product.Id = (int) await cmd.ExecuteScalarAsync();
+
+                    return CreatedAtRoute("GetProduct", new { id = product.Id }, product);
                 }
             }
         }
 
         // PUT api/values/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] Customer customer)
+        public async Task<IActionResult> Put(int id, [FromBody] Product product)
         {
             try
             {
@@ -133,13 +138,18 @@ namespace BangazonAPI.Controllers
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
                         cmd.CommandText = @"
-                            UPDATE Customer
-                            SET FirstName = @firstName
-                            -- Set the remaining columns here
+                            UPDATE Product
+                            SET Title = @title
+                            SET Price = @price
+                            SET Description = @description
+                            SET Quantity = @quantity
                             WHERE Id = @id
                         ";
-                        cmd.Parameters.Add(new SqlParameter("@id", customer.Id));
-                        cmd.Parameters.Add(new SqlParameter("@firstName", customer.FirstName));
+                        cmd.Parameters.Add(new SqlParameter("@title", product.Title));
+                        cmd.Parameters.Add(new SqlParameter("@price", product.Price));
+                        cmd.Parameters.Add(new SqlParameter("@description", product.Description));
+                        cmd.Parameters.Add(new SqlParameter("@quantity", product.Quantity));
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
 
                         int rowsAffected = await cmd.ExecuteNonQueryAsync();
 
@@ -154,7 +164,7 @@ namespace BangazonAPI.Controllers
             }
             catch (Exception)
             {
-                if (!CustomerExists(id))
+                if (!ProductExists(id))
                 {
                     return NotFound();
                 }
@@ -168,10 +178,40 @@ namespace BangazonAPI.Controllers
         // DELETE api/values/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
-        {
+       {
+            try
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"DELETE FROM Product WHERE Id = @id";
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                        int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                        if (rowsAffected > 0)
+                        {
+                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                        }
+                        throw new Exception("No rows affected");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                if (!ProductExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
 
-        private bool CustomerExists(int id)
+        private bool ProductExists(int id)
         {
             using (SqlConnection conn = Connection)
             {
@@ -179,7 +219,7 @@ namespace BangazonAPI.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     // More string interpolation
-                    cmd.CommandText = "SELECT Id FROM Customer WHERE Id = @id";
+                    cmd.CommandText = "SELECT Id FROM Product WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
 
                     SqlDataReader reader = cmd.ExecuteReader();

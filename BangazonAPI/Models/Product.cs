@@ -15,7 +15,7 @@ namespace BangazonAPI.Models
         [StringLength(255)]
         public string Title { get; set; }
         [Required]
-        public int Price { get; set; }
+        public decimal Price { get; set; }
         [Required]
         [StringLength(255)]
         public string Description { get; set; }
