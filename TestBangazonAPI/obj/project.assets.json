@@ -10534,23 +10534,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\prafu\\.nuget\\packages\\": {},
+    "C:\\Users\\TheLastUchiha\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\prafu\\workspace\\csharp\\Bagazon\\bangazon-api-punctual-puffins\\TestBangazonAPI\\TestBangazonAPI.csproj",
+      "projectUniqueName": "C:\\Users\\TheLastUchiha\\workspace\\csharp\\bangazon-api-punctual-puffins\\TestBangazonAPI\\TestBangazonAPI.csproj",
       "projectName": "TestBangazonAPI",
-      "projectPath": "C:\\Users\\prafu\\workspace\\csharp\\Bagazon\\bangazon-api-punctual-puffins\\TestBangazonAPI\\TestBangazonAPI.csproj",
-      "packagesPath": "C:\\Users\\prafu\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\prafu\\workspace\\csharp\\Bagazon\\bangazon-api-punctual-puffins\\TestBangazonAPI\\obj\\",
+      "projectPath": "C:\\Users\\TheLastUchiha\\workspace\\csharp\\bangazon-api-punctual-puffins\\TestBangazonAPI\\TestBangazonAPI.csproj",
+      "packagesPath": "C:\\Users\\TheLastUchiha\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\TheLastUchiha\\workspace\\csharp\\bangazon-api-punctual-puffins\\TestBangazonAPI\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\prafu\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\TheLastUchiha\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -10563,8 +10563,8 @@
       "frameworks": {
         "netcoreapp2.1": {
           "projectReferences": {
-            "C:\\Users\\prafu\\workspace\\csharp\\Bagazon\\bangazon-api-punctual-puffins\\BangazonAPI\\BangazonAPI.csproj": {
-              "projectPath": "C:\\Users\\prafu\\workspace\\csharp\\Bagazon\\bangazon-api-punctual-puffins\\BangazonAPI\\BangazonAPI.csproj"
+            "C:\\Users\\TheLastUchiha\\workspace\\csharp\\bangazon-api-punctual-puffins\\BangazonAPI\\BangazonAPI.csproj": {
+              "projectPath": "C:\\Users\\TheLastUchiha\\workspace\\csharp\\bangazon-api-punctual-puffins\\BangazonAPI\\BangazonAPI.csproj"
             }
           }
         }
