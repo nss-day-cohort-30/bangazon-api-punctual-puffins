@@ -161,7 +161,7 @@ namespace TestBangazonAPI
                 /*
                     ASSERT
                 */
-                Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+                Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             }
         }
         [Fact]
@@ -202,12 +202,12 @@ namespace TestBangazonAPI
                 /*
                     ARRANGE
                 */
-                int testId = 1000;
+                
 
                 /*
                     ACT
                 */
-                var newResponse = await client.DeleteAsync($"/api/producttype/{testId}");
+                var newResponse = await client.DeleteAsync($"/api/producttype/1000");
 
 
                 string newResponseBody = await newResponse.Content.ReadAsStringAsync();
