@@ -32,14 +32,16 @@ namespace BangazonAPI.Controllers
 
         // GET api/values
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get(string _filter,  string _include, int? _gt )
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT d.Id, 
+                    if (_include == "employees")
+                    {
+                        cmd.CommandText = @"SELECT d.Id, 
                                            d.Name, 
                                             d.Budget, 
                                             e.Id empId,
@@ -47,45 +49,80 @@ namespace BangazonAPI.Controllers
                                             e.LastName,
                                             e.IsSupervisor
                                         FROM Department d LEFT JOIN Employee e
-                                        ON d.Id = e.DepartmentId";
-                    SqlDataReader reader = await cmd.ExecuteReaderAsync();
-
-                    
-                    Dictionary<int, Department> HashTable = new Dictionary<int, Department>();
-                    while (reader.Read())
-                    {
-                        int DeptId = reader.GetInt32(reader.GetOrdinal("Id"));
-                        if (!HashTable.ContainsKey(DeptId))
+                                        ON d.Id = e.DepartmentId
+                                        WHERE 2 =2";
+                        if (_filter == "budget")
                         {
-                            Department dept = new Department
+                            cmd.CommandText += " AND d.Budget >= @gt";
+                            cmd.Parameters.Add(new SqlParameter("@gt", _gt));
+                        }
+                        SqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+
+                        Dictionary<int, Department> HashTable = new Dictionary<int, Department>();
+                        while (reader.Read())
+                        {
+                            int DeptId = reader.GetInt32(reader.GetOrdinal("Id"));
+                            if (!HashTable.ContainsKey(DeptId))
+                            {
+                                Department dept = new Department
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    Name = reader.GetString(reader.GetOrdinal("Name")),
+                                    Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
+                                    // You might have more columns
+                                };
+                                HashTable[DeptId] = dept;
+                            };
+                            Console.WriteLine(reader.IsDBNull(reader.GetOrdinal("empId")));
+                            //if (reader.GetString(reader.GetOrdinal("FirstName")) != null)
+                            if (!reader.IsDBNull(reader.GetOrdinal("empId")))
+                            {
+
+                                Employee employee = new Employee
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("empId")),
+                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                    LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                    Supervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor"))
+                                };
+                                HashTable[DeptId].Employees.Add(employee);
+                            }
+                        }
+
+                        reader.Close();
+                        List<Department> departments = HashTable.Values.ToList();
+
+                        return Ok(departments);
+                    }
+
+                    else
+                    {
+                        cmd.CommandText = @"SELECT Id, 
+                                           Name, 
+                                            Budget
+                                        FROM Department
+                                        WHERE 2 = 2";
+                        if (_filter == "budget")
+                        {
+                            cmd.CommandText += " AND Budget >= @gt";
+                            cmd.Parameters.Add(new SqlParameter("@gt", _gt));
+                        }
+                        SqlDataReader reader = await cmd.ExecuteReaderAsync();
+                        List<Department> departments = new List<Department>();
+                        while (reader.Read())
+                        {
+                            departments.Add(new Department
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("Id")),
                                 Name = reader.GetString(reader.GetOrdinal("Name")),
                                 Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
-                                // You might have more columns
-                            };
-                            HashTable[DeptId] = dept;
-                        };
-                        Console.WriteLine(reader.IsDBNull(reader.GetOrdinal("empId")));
-                        //if (reader.GetString(reader.GetOrdinal("FirstName")) != null)
-                        if (!reader.IsDBNull(reader.GetOrdinal("empId")))
-                        {
-                            
-                            Employee employee = new Employee
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("empId")),
-                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                                Supervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor"))
-                            };
-                            HashTable[DeptId].Employees.Add(employee);
+                            });
                         }
+                        reader.Close();
+                        return Ok(departments);
                     }
-
-                    reader.Close();
-                    List<Department> departments = HashTable.Values.ToList();
-
-                    return Ok(departments);
+                    //return new StatusCodeResult(StatusCodes.Status204NoContent);
                 }
             }
         }
