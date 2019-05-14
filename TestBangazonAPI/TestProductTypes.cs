@@ -137,7 +137,7 @@ namespace TestBangazonAPI
             }
         }
         [Fact]
-        public async Task Test_Get_One_False_ProductType()
+        public async Task Test_getOneFalse_updateOneFalse_deleteOneFalse_ProductType()
         {
             using (var client = new APIClientProvider().Client)
             {
@@ -159,6 +159,42 @@ namespace TestBangazonAPI
                     ASSERT
                 */
                 Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+
+                /* UPDATE FALSE CREATION */
+                /*
+                   ARRANGE
+               */
+                ProductType updateProduct = new ProductType
+                {
+                    Name = "Dog Socks"
+                };
+
+                var falseUpdateProductAsJSON = JsonConvert.SerializeObject(updateProduct);
+                /*
+                    ACT
+                */
+                var falseUpdateResponse = await client.PutAsync($"/api/producttype/1000",
+                    new StringContent(falseUpdateProductAsJSON, Encoding.UTF8, "application/json"));
+
+
+                string falseUpdateResponseBody = await falseUpdateResponse.Content.ReadAsStringAsync();
+
+                Assert.Equal(HttpStatusCode.NotFound, falseUpdateResponse.StatusCode);
+
+                /* DELETE FALSE CREATION*/
+                /*
+                    ARRANGE
+                */
+
+                /*
+                    ACT
+                */
+                var newResponse = await client.DeleteAsync($"/api/producttype/1000");
+
+
+                string newResponseBody = await newResponse.Content.ReadAsStringAsync();
+
+                Assert.Equal(HttpStatusCode.NotFound, newResponse.StatusCode);
             }
         }
     }
