@@ -39,7 +39,7 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = "SELECT Id, Title, Price, Description, Quantity FROM Product";
+                    cmd.CommandText = "SELECT Id, ProductTypeId, CustomerId, Title, Price, Description, Quantity FROM Product";
                     SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
                     List<Product> products = new List<Product>();
@@ -48,16 +48,15 @@ namespace BangazonAPI.Controllers
                         Product product = new Product
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            ProductTypeId = reader.GetInt32(reader.GetOrdinal("ProductTypeId")),
+                            CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
                             Title = reader.GetString(reader.GetOrdinal("Title")),
                             Price = reader.GetDecimal(reader.GetOrdinal("Price")),
                             Description = reader.GetString(reader.GetOrdinal("Description")),
                            Quantity = reader.GetInt32(reader.GetOrdinal("Quantity"))
-                          
     };
-
                        products.Add(product);
                     }
-
                     reader.Close();
 
                     return Ok(products);
@@ -66,7 +65,7 @@ namespace BangazonAPI.Controllers
         }
 
         // GET api/values/5
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "GetProduct")]
         public async Task<IActionResult> Get(int id)
         {
             using (SqlConnection conn = Connection)
@@ -74,7 +73,7 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT Id, Title, Price, Description, Quantity FROM Product WHERE Id = @id";
+                    cmd.CommandText = @"SELECT Id, ProductTypeId,  CustomerId, Title, Price, Description, Quantity FROM Product WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
@@ -84,13 +83,14 @@ namespace BangazonAPI.Controllers
                         product = new Product
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            ProductTypeId = reader.GetInt32(reader.GetOrdinal("ProductTypeId")),
+                            CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
                             Title = reader.GetString(reader.GetOrdinal("Title")),
                             Price = reader.GetDecimal(reader.GetOrdinal("Price")),
                             Description = reader.GetString(reader.GetOrdinal("Description")),
                             Quantity = reader.GetInt32(reader.GetOrdinal("Quantity"))
                         };
                     }
-
                     reader.Close();
 
                     return Ok(product);
@@ -109,11 +109,13 @@ namespace BangazonAPI.Controllers
                 {
                     
                     cmd.CommandText = @"
-                        INSERT INTO Product (Title, Price, Description, Quantity)
+                        INSERT INTO Product (ProductTypeId, CustomerId, Title, Price, Description, Quantity)
                         OUTPUT INSERTED.Id
-                        VALUES ('@title', '@price', '@description', '@quantity')
+                        VALUES (@productTypeId, @customerId, @title, @price, @description, @quantity)
                     ";
 
+                    cmd.Parameters.Add(new SqlParameter("@productTypeId", product.ProductTypeId));
+                    cmd.Parameters.Add(new SqlParameter("@customerId", product.CustomerId));
                     cmd.Parameters.Add(new SqlParameter("@title", product.Title));
                     cmd.Parameters.Add(new SqlParameter("@price", product.Price));
                     cmd.Parameters.Add(new SqlParameter("@description", product.Description));
@@ -128,7 +130,7 @@ namespace BangazonAPI.Controllers
 
         // PUT api/values/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] Product product)
+        public async Task<IActionResult> Put( int id, [FromBody] Product product)
         {
             try
             {
@@ -139,12 +141,11 @@ namespace BangazonAPI.Controllers
                     {
                         cmd.CommandText = @"
                             UPDATE Product
-                            SET Title = @title
-                            SET Price = @price
-                            SET Description = @description
-                            SET Quantity = @quantity
+                            SET ProductTypeId = @productTypeId, CustomerId = @customerId, Title = @title, Price = @price,  Description = @description, Quantity = @quantity
                             WHERE Id = @id
                         ";
+                        cmd.Parameters.Add(new SqlParameter("@productTypeId", product.ProductTypeId));
+                        cmd.Parameters.Add(new SqlParameter("@customerId", product.CustomerId));
                         cmd.Parameters.Add(new SqlParameter("@title", product.Title));
                         cmd.Parameters.Add(new SqlParameter("@price", product.Price));
                         cmd.Parameters.Add(new SqlParameter("@description", product.Description));
@@ -157,7 +158,6 @@ namespace BangazonAPI.Controllers
                         {
                             return new StatusCodeResult(StatusCodes.Status204NoContent);
                         }
-
                         throw new Exception("No rows affected");
                     }
                 }
