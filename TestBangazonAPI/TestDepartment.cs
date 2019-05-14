@@ -76,7 +76,7 @@ namespace TestBangazonAPI
         {
             using (var client = new APIClientProvider().Client)
             {
-                var response = await client.GetAsync("/api/Department?_filter=budget&_gt=300");
+                var response = await client.GetAsync("/api/Department?_filter=budget&_gt=30000");
 
 
                 string responseBody = await response.Content.ReadAsStringAsync();
@@ -95,7 +95,7 @@ namespace TestBangazonAPI
         {
             using (var client = new APIClientProvider().Client)
             {
-                var response = await client.GetAsync("/api/Department?_filter=budget&_gt=300&_include=employees");
+                var response = await client.GetAsync("/api/Department?_filter=budget&_gt=30000&_include=employees");
 
 
                 string responseBody = await response.Content.ReadAsStringAsync();
