@@ -69,6 +69,10 @@ namespace BangazonAPI.Controllers
         [HttpGet("{id}", Name = "GetComputer")]
         public async Task<IActionResult> Get(int id)
         {
+            if (!ComputerExists(id))
+            {
+                return new StatusCodeResult(StatusCodes.Status404NotFound);
+            }
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
@@ -189,6 +193,10 @@ namespace BangazonAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
+            if (!ComputerExists(id))
+            {
+                return new StatusCodeResult(StatusCodes.Status404NotFound);
+            }
             try
             {
                 using (SqlConnection conn = Connection)

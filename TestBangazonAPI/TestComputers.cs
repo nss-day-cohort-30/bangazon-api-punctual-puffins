@@ -12,6 +12,7 @@ namespace TestBangazonAPI
 {
     public class TestComputers
     {
+       
         [Fact]
         public async Task Test_Get_All_Computers()
         {
@@ -19,8 +20,6 @@ namespace TestBangazonAPI
             {
 
                 var response = await client.GetAsync("/api/computers");
-
-
                 string responseBody = await response.Content.ReadAsStringAsync();
                 var computers = JsonConvert.DeserializeObject<List<Computer>>(responseBody);
 
@@ -30,73 +29,72 @@ namespace TestBangazonAPI
         }
 
         [Fact]
-        public async Task Test_Modify_Computer()
+        public async Task Test_Post_Computer()
         {
-            // New last name to change to and test
-            string newMake = "Matebook X";
-
             using (var client = new APIClientProvider().Client)
             {
-                /*
-                    PUT section
-                */
-                Computer modifiedHuawei = new Computer
+
+               Computer newTestComputer = new Computer
                 {
-                    PurchaseDate = DateTime.Parse ("2015-05-12 12:00:00"),
-                    DecomissionDate = DateTime.Parse ("2019-05-13 17:00:00"),
+                    PurchaseDate = DateTime.Parse("2019-01-01 12:00:00"),
+                    DecomissionDate = DateTime.Parse("2019-12-15 17:00:00"),
+                    Make = "Blade Stealth 13",
+                    Manufacturer = "Razer"
+                }; 
+
+                var newTestComputerAsJSON = JsonConvert.SerializeObject(newTestComputer);
+
+                var response = await client.PostAsync(
+                   "/api/computers/",
+                   new StringContent(newTestComputerAsJSON, Encoding.UTF8, "application/json")
+               );
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+            }
+
+        }
+
+        [Fact]
+        public async Task Test_Modify_Computer()
+        {
+        
+            using (var client = new APIClientProvider().Client)
+            {
+                // New last name to change to and test
+                string newMake = "NoteBook 9 Has Been Edited";
+                string newModel = "Samsung Has Been Edited";
+
+                Computer modifiedTestComputer = new Computer
+                {
+                    PurchaseDate = DateTime.Parse("2019-01-01 12:00:00"),
+                    DecomissionDate = DateTime.Parse("2019-04-24 15:00:00"),
                     Make = newMake,
-                    Manufacturer = "Huawei"
+                    Manufacturer = newModel
                 };
-                var modifiedHuaweiAsJSON = JsonConvert.SerializeObject(modifiedHuawei);
+                var modifiedTestComputerAsJSON = JsonConvert.SerializeObject(modifiedTestComputer);
 
                 var response = await client.PutAsync(
-                    "/api/computers/2",
-                    new StringContent(modifiedHuaweiAsJSON, Encoding.UTF8, "application/json")
-                );
+                   "/api/computers/1",
+                   new StringContent(modifiedTestComputerAsJSON, Encoding.UTF8, "application/json")
+               );
                 string responseBody = await response.Content.ReadAsStringAsync();
 
                 Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
 
                 /*
-                    GET section
-                    Verify that the PUT operation was successful
-                */
-                var getHuawei = await client.GetAsync("/api/computers/2");
-                getHuawei.EnsureSuccessStatusCode();
+                   GET section
+                   Verify that the PUT operation was successful
+               */
+                var getComputer = await client.GetAsync($"/api/computers/1");
+                getComputer.EnsureSuccessStatusCode();
 
-                string getHuaweiBody = await getHuawei.Content.ReadAsStringAsync();
-                Computer newHuawei = JsonConvert.DeserializeObject<Computer>(getHuaweiBody);
+                string getComputerBody = await getComputer.Content.ReadAsStringAsync();
+                Computer newComputer = JsonConvert.DeserializeObject<Computer>(getComputerBody);
 
-                Assert.Equal(HttpStatusCode.OK, getHuawei.StatusCode);
-                Assert.Equal(newMake, newHuawei.Make);
+                Assert.Equal(HttpStatusCode.OK, getComputer.StatusCode);
+                Assert.Equal(newMake, newComputer.Make);
             }
-        }
-
-        [Fact]
-        public async Task Test_Post_Computer()
-        {
-            using (var client = new APIClientProvider().Client)
-            {
-               
-                Computer newTestComputer = new Computer
-                {
-                    PurchaseDate = DateTime.Parse("2019-01-01 12:00:00"),
-                    DecomissionDate = DateTime.Parse("2019-12-15 17:00:00"),
-                    Make = "MacBook Air",
-                    Manufacturer = "Apple"
-                };
-
-                var newTestComputerAsJSON = JsonConvert.SerializeObject(newTestComputer);
-
-                var response = await client.PostAsync(
-                    "/api/computers/",
-                    new StringContent(newTestComputerAsJSON, Encoding.UTF8, "application/json")
-                );
-                string responseBody = await response.Content.ReadAsStringAsync();
-
-            }
-
         }
 
         [Fact]
@@ -104,9 +102,8 @@ namespace TestBangazonAPI
         {
             using (var client = new APIClientProvider().Client)
             {
-                var response = await client.DeleteAsync("/api/computers/14");
-                Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-
+                var response = await client.DeleteAsync($"/api/computers/5");
+                Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             }
 
         }
