@@ -166,9 +166,9 @@ namespace BangazonAPI.Controllers
                 {
                     // More string interpolation
                     cmd.CommandText = @"
-                        INSERT INTO Department ([Name], Budget, IsSupervisor) 
+                        INSERT INTO Department ([Name], Budget) 
                         OUTPUT INSERTED.Id
-                        VALUES (@name, @budget, @isSupervisor)
+                        VALUES (@name, @budget)
                     ";
                     cmd.Parameters.Add(new SqlParameter("@name", department.Name));
                     cmd.Parameters.Add(new SqlParameter("@budget", department.Budget));

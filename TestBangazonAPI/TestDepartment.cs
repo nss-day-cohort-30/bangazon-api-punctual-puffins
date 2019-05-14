@@ -98,9 +98,9 @@ namespace TestBangazonAPI
 
                 Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-                /*
-                    GET section
-                 */
+               
+                  //  GET single department 
+                 
                 var getNewDept = await client.GetAsync($"/api/Department/{TestId}");
                 getNewDept.EnsureSuccessStatusCode();
                 
