@@ -39,33 +39,7 @@ namespace TestBangazonAPI
             }
         }
         [Fact]
-        public async Task Test_Get_One_ProductType()
-        {
-            using (var client = new APIClientProvider().Client)
-            {
-                /*
-                    ARRANGE
-                */
-                
-
-                /*
-                    ACT
-                */
-                var response = await client.GetAsync($"/api/producttype/5");
-
-
-                string responseBody = await response.Content.ReadAsStringAsync();
-                var productType = JsonConvert.DeserializeObject<ProductType>(responseBody);
-
-                /*
-                    ASSERT
-                */
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                Assert.Matches(productType.Name, "Banana Hammock");
-            }
-        }
-        [Fact]
-        public async Task Test_Create_Update_And_Delete_One_ProductType()
+        public async Task Test_createOne_updateOne_getOne_deleteOne_ProductType()
         {
             using (var client = new APIClientProvider().Client)
             {
@@ -123,6 +97,27 @@ namespace TestBangazonAPI
 
                 Assert.Equal(HttpStatusCode.OK, getDogSocks.StatusCode);
                 Assert.Equal("Dog Socks", newDogSocks.Name);
+
+                /* GET ONE PRODUCT TYPE */
+                /*
+                    ARRANGE
+                */
+
+
+                /*
+                    ACT
+                */
+                var getResponse = await client.GetAsync($"/api/producttype/{newDogSocks.Id}");
+
+
+                string getResponseBody = await getResponse.Content.ReadAsStringAsync();
+                var getProductType = JsonConvert.DeserializeObject<ProductType>(getResponseBody);
+
+                /*
+                    ASSERT
+                */
+                Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
+                Assert.Matches(getProductType.Name, "Dog Socks");
 
 
                 /* DELETE CREATION*/
