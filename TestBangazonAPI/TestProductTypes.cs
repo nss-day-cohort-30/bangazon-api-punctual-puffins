@@ -39,7 +39,7 @@ namespace TestBangazonAPI
             }
         }
         [Fact]
-        public async Task Test_createOne_updateOne_getOne_deleteOne_ProductType()
+        public async Task Test_Create_One_Delete_One_ProductType()
         {
             using (var client = new APIClientProvider().Client)
             {
@@ -55,7 +55,7 @@ namespace TestBangazonAPI
                 /*
                     ACT
                 */
-                var response = await client.PostAsync($"/api/producttype/", 
+                var response = await client.PostAsync($"/api/producttype/",
                     new StringContent(newProductAsJSON, Encoding.UTF8, "application/json"));
 
 
@@ -68,35 +68,18 @@ namespace TestBangazonAPI
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
                 Assert.Matches(newProductType.Name, "Thundershirt");
 
-                /* UPDATE CREATION */
-                /*
-                   ARRANGE
-               */
-                ProductType updateProduct = new ProductType
-                {
-                    Name = "Dog Socks"
-                };
+                /*DELETE*/
 
-                var updateProductAsJSON = JsonConvert.SerializeObject(updateProduct);
-                /*
-                    ACT
-                */
-                var updateResponse = await client.PutAsync($"/api/producttype/{newProductType.Id}",
-                    new StringContent(updateProductAsJSON, Encoding.UTF8, "application/json"));
-
-
-                string updateResponseBody = await updateResponse.Content.ReadAsStringAsync();
-
-                Assert.Equal(HttpStatusCode.NoContent, updateResponse.StatusCode);
-
-                var getDogSocks = await client.GetAsync($"/api/producttype/{newProductType.Id}");
-                getDogSocks.EnsureSuccessStatusCode();
-
-                string getDogSocksBody = await getDogSocks.Content.ReadAsStringAsync();
-                ProductType newDogSocks = JsonConvert.DeserializeObject<ProductType>(getDogSocksBody);
-
-                Assert.Equal(HttpStatusCode.OK, getDogSocks.StatusCode);
-                Assert.Equal("Dog Socks", newDogSocks.Name);
+                var deleteResponse = await client.DeleteAsync($"/api/producttype/{newProductType.Id}");
+                deleteResponse.EnsureSuccessStatusCode();
+                Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
+            }
+        }
+        [Fact]
+        public async Task Test_Get_One_ProductType()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
 
                 /* GET ONE PRODUCT TYPE */
                 /*
@@ -107,7 +90,7 @@ namespace TestBangazonAPI
                 /*
                     ACT
                 */
-                var getResponse = await client.GetAsync($"/api/producttype/{newDogSocks.Id}");
+                var getResponse = await client.GetAsync($"/api/producttype/2");
 
 
                 string getResponseBody = await getResponse.Content.ReadAsStringAsync();
@@ -117,27 +100,47 @@ namespace TestBangazonAPI
                     ASSERT
                 */
                 Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
-                Assert.Matches(getProductType.Name, "Dog Socks");
-
-
-                /* DELETE CREATION*/
-                /*
-                    ARRANGE
-                */
-
-                /*
-                    ACT
-                */
-                var newResponse = await client.DeleteAsync($"/api/producttype/{newProductType.Id}");
-
-
-                string newResponseBody = await newResponse.Content.ReadAsStringAsync();
-
-                Assert.Equal(HttpStatusCode.NoContent, newResponse.StatusCode);
+                Assert.Matches(getProductType.Name, "Video Game");
             }
         }
         [Fact]
-        public async Task Test_getOneFalse_updateOneFalse_deleteOneFalse_ProductType()
+        public async Task Test_Update_One_ProductType()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                /* UPDATE CREATION */
+                /*
+                   ARRANGE
+               */
+                ProductType updateProduct = new ProductType
+                {
+                    Name = "Dog Socks"
+                };
+
+            var updateProductAsJSON = JsonConvert.SerializeObject(updateProduct);
+            /*
+                ACT
+            */
+            var updateResponse = await client.PutAsync($"/api/producttype/1",
+                new StringContent(updateProductAsJSON, Encoding.UTF8, "application/json"));
+
+
+            string updateResponseBody = await updateResponse.Content.ReadAsStringAsync();
+
+            Assert.Equal(HttpStatusCode.NoContent, updateResponse.StatusCode);
+
+            var getDogSocks = await client.GetAsync($"/api/producttype/1");
+            getDogSocks.EnsureSuccessStatusCode();
+
+            string getDogSocksBody = await getDogSocks.Content.ReadAsStringAsync();
+            ProductType newDogSocks = JsonConvert.DeserializeObject<ProductType>(getDogSocksBody);
+
+            Assert.Equal(HttpStatusCode.OK, getDogSocks.StatusCode);
+            Assert.Equal("Dog Socks", newDogSocks.Name);
+        }
+    }
+        [Fact]
+        public async Task Test_getOneFalse_ProductType()
         {
             using (var client = new APIClientProvider().Client)
             {
@@ -159,6 +162,13 @@ namespace TestBangazonAPI
                     ASSERT
                 */
                 Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+            }
+        }
+        [Fact]
+        public async Task Test_updateOneFalse_ProductType()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
 
                 /* UPDATE FALSE CREATION */
                 /*
@@ -180,16 +190,24 @@ namespace TestBangazonAPI
                 string falseUpdateResponseBody = await falseUpdateResponse.Content.ReadAsStringAsync();
 
                 Assert.Equal(HttpStatusCode.NotFound, falseUpdateResponse.StatusCode);
+            }
+        }
+        [Fact]
+        public async Task Test_deleteOneFalse_ProductType()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
 
                 /* DELETE FALSE CREATION*/
                 /*
                     ARRANGE
                 */
+                int testId = 1000;
 
                 /*
                     ACT
                 */
-                var newResponse = await client.DeleteAsync($"/api/producttype/1000");
+                var newResponse = await client.DeleteAsync($"/api/producttype/{testId}");
 
 
                 string newResponseBody = await newResponse.Content.ReadAsStringAsync();
