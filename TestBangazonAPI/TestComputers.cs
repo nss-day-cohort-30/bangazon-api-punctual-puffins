@@ -60,7 +60,7 @@ namespace TestBangazonAPI
         
             using (var client = new APIClientProvider().Client)
             {
-                // New last name to change to and test
+                
                 string newMake = "NoteBook 9 Has Been Edited";
                 string newModel = "Samsung Has Been Edited";
 
@@ -82,10 +82,7 @@ namespace TestBangazonAPI
                 Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
 
-                /*
-                   GET section
-                   Verify that the PUT operation was successful
-               */
+                
                 var getComputer = await client.GetAsync($"/api/computers/1");
                 getComputer.EnsureSuccessStatusCode();
 

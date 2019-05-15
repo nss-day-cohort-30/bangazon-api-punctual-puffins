@@ -46,13 +46,13 @@ namespace BangazonAPI.Controllers
                     {
                         Computer computer = new Computer
                         {       
-                               // GetInt32, GetDateTime, and Get String are the types of said columns
+                            
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate")),
                             DecomissionDate = reader.GetDateTime(reader.GetOrdinal("DecomissionDate")),
                             Make = reader.GetString(reader.GetOrdinal("Make")),
                             Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
-                            // You might have more columns
+                        
                         };
 
                         computers.Add(computer);
@@ -96,7 +96,7 @@ namespace BangazonAPI.Controllers
                             DecomissionDate = reader.GetDateTime(reader.GetOrdinal("DecomissionDate")),
                             Make = reader.GetString(reader.GetOrdinal("Make")),
                             Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
-                            // You might have more columns
+                           
                         };
                     }
 
@@ -116,11 +116,7 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    // More string interpolation
-                    // @ is for multiple lines
-                    //$ string interpolation
-                    //VALUES (@purchaseDate,@decomissionDate,@make,@manufacturer)
-                    //VALUES('{computer.PurchaseDate}', '{computer.DecomissionDate}', '{computer.Make}', '{computer.Manufacturer}')
+                    
                     cmd.CommandText = $@"
                         INSERT INTO Computer (PurchaseDate, DecomissionDate, Make, Manufacturer) 
                         OUTPUT INSERTED.Id
@@ -132,7 +128,7 @@ namespace BangazonAPI.Controllers
                     cmd.Parameters.Add(new SqlParameter("@manufacturer", computer.Manufacturer));
 
                     computer.Id = (int)await cmd.ExecuteScalarAsync();
-                           //This invokes the above Get method, to get, what was just posted 
+                          
                     return CreatedAtRoute("GetComputer", new { id = computer.Id }, computer);
                 }
             }
