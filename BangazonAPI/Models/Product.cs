@@ -23,7 +23,7 @@ namespace BangazonAPI.Models
         public int Quantity { get; set; }
         public int ProdcuTypeId { get; set; }
         public int CustomerId { get; set; }
-        ProductType ProductType { get; set; }
-        Customer SellingCustomer { get; set; }
+        public ProductType ProductType { get; set; }
+        public Customer SellingCustomer { get; set; }
     }
 }

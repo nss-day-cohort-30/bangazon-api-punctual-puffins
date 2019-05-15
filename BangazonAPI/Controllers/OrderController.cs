@@ -82,9 +82,12 @@ namespace BangazonAPI.Controllers
                                                 p.Title, 
                                                 p.Quantity, 
                                                 p.[Description], 
+                                                pt.[Name],
+                                                op.ProductTypeId PtId,
                                                 p.Price
                                             FROM [Order] o Left Join orderProduct op on o.Id = op.OrderId
-                                            JOIN Product p on p.Id = op.ProductId";
+                                            JOIN Product p ON p.Id = op.ProductId
+                                            JOIN ProductType pt ON op.ProductId = pt.Id";
 
                         SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
@@ -110,7 +113,13 @@ namespace BangazonAPI.Controllers
                                     Id = reader.GetInt32(reader.GetOrdinal("opId")),
                                     Title = reader.GetString(reader.GetOrdinal("Title")),
                                     Description = reader.GetString(reader.GetOrdinal("Description")),
-                                    Price = reader.GetInt32(reader.GetOrdinal("Price"))
+                                    Price = reader.GetInt32(reader.GetOrdinal("Price")),
+                                    Quantity = reader.GetInt32(reader.GetOrdinal("Quantity")),
+                                    ProductType = new ProductType
+                                    {
+                                        Id = reader.GetInt32(reader.GetOrdinal("PtId")),
+                                        Name = reader.GetString(reader.GetOrdinal("Name"))
+                                    }
                                 };
                                 HashTable[orderId].Products.Add(product);
                             }
