@@ -49,7 +49,6 @@ namespace BangazonAPI.Controllers
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             Name = reader.GetString(reader.GetOrdinal("Name")),
-                            // You might have more columns
                         };
 
                         productTypes.Add(productType);
@@ -66,37 +65,33 @@ namespace BangazonAPI.Controllers
         [HttpGet("{id}", Name = "GetProductType")]
         public async Task<IActionResult> Get(int id)
         {
-            try
+            if (!ProductTypeExists(id))
             {
-                using (SqlConnection conn = Connection)
-                {
-                    conn.Open();
-                    using (SqlCommand cmd = conn.CreateCommand())
-                    {
-                        cmd.CommandText = "SELECT Id, Name FROM ProductType WHERE @id = ProductType.Id";
-                        cmd.Parameters.Add(new SqlParameter("@id", id));
-                        SqlDataReader reader = await cmd.ExecuteReaderAsync();
-
-                        ProductType productType = null;
-                        if (reader.Read())
-                        {
-                            productType = new ProductType
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                                Name = reader.GetString(reader.GetOrdinal("Name")),
-                                // You might have more columns
-                            };
-                        }
-
-                        reader.Close();
-
-                        return Ok(productType);
-                    }
-                }
+                return new StatusCodeResult(StatusCodes.Status404NotFound);
             }
-            catch
+            using (SqlConnection conn = Connection)
             {
-                return new StatusCodeResult(StatusCodes.Status204NoContent);
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "SELECT Id, Name FROM ProductType WHERE @id = ProductType.Id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+                    ProductType productType = null;
+                    if (reader.Read())
+                    {
+                        productType = new ProductType
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                        };
+                    }
+
+                    reader.Close();
+
+                    return Ok(productType);
+                }
             }
         }
 
@@ -109,7 +104,6 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    // More string interpolation
                     cmd.CommandText = @"
                         INSERT INTO ProductType (Name)
                         OUTPUT INSERTED.Id
@@ -173,41 +167,31 @@ namespace BangazonAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            try
+            if (!ProductTypeExists(id))
             {
-                using (SqlConnection conn = Connection)
-                {
-                    conn.Open();
-                    using (SqlCommand cmd = conn.CreateCommand())
-                    {
-                        cmd.CommandText = @"
-                           DELETE FROM ProductType WHERE Id = @id
-                        ";
-                        cmd.Parameters.Add(new SqlParameter("@id", id));
-
-                        int rowsAffected = await cmd.ExecuteNonQueryAsync();
-
-                        if (rowsAffected > 0)
-                        {
-                            return new StatusCodeResult(StatusCodes.Status204NoContent);
-                        }
-
-                        throw new Exception("No rows affected");
-                    }
-                }
+                return new StatusCodeResult(StatusCodes.Status404NotFound);
             }
-            catch (Exception)
+            using (SqlConnection conn = Connection)
             {
-                if (!ProductTypeExists(id))
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
+                    cmd.CommandText = "DELETE FROM ProductType WHERE Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                    int rowsAffected = await cmd.ExecuteNonQueryAsync();
+
+                    if (rowsAffected > 0)
+                    {
+                        return new StatusCodeResult(StatusCodes.Status204NoContent);
+                    }
+
+                    throw new Exception("No rows affected");
                 }
             }
         }
+    
+
 
 
         private bool ProductTypeExists(int id)
@@ -217,7 +201,6 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    // More string interpolation
                     cmd.CommandText = "SELECT Id FROM ProductType WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
 

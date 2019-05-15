@@ -18,11 +18,6 @@ namespace TestBangazonAPI
             using (var client = new APIClientProvider().Client)
             {
                 /*
-                    ARRANGE
-                */
-
-
-                /*
                     ACT
                 */
                 var response = await client.GetAsync("/api/producttype");
@@ -39,33 +34,7 @@ namespace TestBangazonAPI
             }
         }
         [Fact]
-        public async Task Test_Get_One_ProductType()
-        {
-            using (var client = new APIClientProvider().Client)
-            {
-                /*
-                    ARRANGE
-                */
-                
-
-                /*
-                    ACT
-                */
-                var response = await client.GetAsync($"/api/producttype/5");
-
-
-                string responseBody = await response.Content.ReadAsStringAsync();
-                var productType = JsonConvert.DeserializeObject<ProductType>(responseBody);
-
-                /*
-                    ASSERT
-                */
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                Assert.Matches(productType.Name, "Banana Hammock");
-            }
-        }
-        [Fact]
-        public async Task Test_Create_Update_And_Delete_One_ProductType()
+        public async Task Test_Create_One_Delete_One_ProductType()
         {
             using (var client = new APIClientProvider().Client)
             {
@@ -81,7 +50,7 @@ namespace TestBangazonAPI
                 /*
                     ACT
                 */
-                var response = await client.PostAsync($"/api/producttype/", 
+                var response = await client.PostAsync("/api/producttype/",
                     new StringContent(newProductAsJSON, Encoding.UTF8, "application/json"));
 
 
@@ -94,7 +63,39 @@ namespace TestBangazonAPI
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
                 Assert.Matches(newProductType.Name, "Thundershirt");
 
-                /* UPDATE CREATION */
+                /*DELETE*/
+
+                var deleteResponse = await client.DeleteAsync($"/api/producttype/{newProductType.Id}");
+                deleteResponse.EnsureSuccessStatusCode();
+                Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
+            }
+        }
+        [Fact]
+        public async Task Test_Get_One_ProductType()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                /*
+                    ACT
+                */
+                var getResponse = await client.GetAsync("/api/producttype/2");
+
+
+                string getResponseBody = await getResponse.Content.ReadAsStringAsync();
+                var getProductType = JsonConvert.DeserializeObject<ProductType>(getResponseBody);
+
+                /*
+                    ASSERT
+                */
+                Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
+                Assert.Matches(getProductType.Name, "Video Game");
+            }
+        }
+        [Fact]
+        public async Task Test_Update_One_ProductType()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
                 /*
                    ARRANGE
                */
@@ -103,58 +104,37 @@ namespace TestBangazonAPI
                     Name = "Dog Socks"
                 };
 
-                var updateProductAsJSON = JsonConvert.SerializeObject(updateProduct);
-                /*
-                    ACT
-                */
-                var updateResponse = await client.PutAsync($"/api/producttype/{newProductType.Id}",
-                    new StringContent(updateProductAsJSON, Encoding.UTF8, "application/json"));
+            var updateProductAsJSON = JsonConvert.SerializeObject(updateProduct);
+            /*
+                ACT
+            */
+            var updateResponse = await client.PutAsync("/api/producttype/1",
+                new StringContent(updateProductAsJSON, Encoding.UTF8, "application/json"));
 
 
-                string updateResponseBody = await updateResponse.Content.ReadAsStringAsync();
+            string updateResponseBody = await updateResponse.Content.ReadAsStringAsync();
 
-                Assert.Equal(HttpStatusCode.NoContent, updateResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.NoContent, updateResponse.StatusCode);
 
-                var getDogSocks = await client.GetAsync($"/api/producttype/{newProductType.Id}");
-                getDogSocks.EnsureSuccessStatusCode();
+            var getDogSocks = await client.GetAsync("/api/producttype/1");
+            getDogSocks.EnsureSuccessStatusCode();
 
-                string getDogSocksBody = await getDogSocks.Content.ReadAsStringAsync();
-                ProductType newDogSocks = JsonConvert.DeserializeObject<ProductType>(getDogSocksBody);
+            string getDogSocksBody = await getDogSocks.Content.ReadAsStringAsync();
+            ProductType newDogSocks = JsonConvert.DeserializeObject<ProductType>(getDogSocksBody);
 
-                Assert.Equal(HttpStatusCode.OK, getDogSocks.StatusCode);
-                Assert.Equal("Dog Socks", newDogSocks.Name);
-
-
-                /* DELETE CREATION*/
-                /*
-                    ARRANGE
-                */
-
-                /*
-                    ACT
-                */
-                var newResponse = await client.DeleteAsync($"/api/producttype/{newProductType.Id}");
-
-
-                string newResponseBody = await newResponse.Content.ReadAsStringAsync();
-
-                Assert.Equal(HttpStatusCode.NoContent, newResponse.StatusCode);
-            }
+            Assert.Equal(HttpStatusCode.OK, getDogSocks.StatusCode);
+            Assert.Equal("Dog Socks", newDogSocks.Name);
         }
+    }
         [Fact]
-        public async Task Test_Get_One_False_ProductType()
+        public async Task Test_getOneFalse_ProductType()
         {
             using (var client = new APIClientProvider().Client)
             {
                 /*
-                    ARRANGE
-                */
-
-
-                /*
                     ACT
                 */
-                var response = await client.GetAsync($"/api/producttype/1000");
+                var response = await client.GetAsync("/api/producttype/1000");
 
 
                 string responseBody = await response.Content.ReadAsStringAsync();
@@ -163,7 +143,49 @@ namespace TestBangazonAPI
                 /*
                     ASSERT
                 */
-                Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+                Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            }
+        }
+        [Fact]
+        public async Task Test_updateOneFalse_ProductType()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                /*
+                   ARRANGE
+               */
+                ProductType updateProduct = new ProductType
+                {
+                    Name = "Dog Socks"
+                };
+
+                var falseUpdateProductAsJSON = JsonConvert.SerializeObject(updateProduct);
+                /*
+                    ACT
+                */
+                var falseUpdateResponse = await client.PutAsync("/api/producttype/1000",
+                    new StringContent(falseUpdateProductAsJSON, Encoding.UTF8, "application/json"));
+
+
+                string falseUpdateResponseBody = await falseUpdateResponse.Content.ReadAsStringAsync();
+
+                Assert.Equal(HttpStatusCode.NotFound, falseUpdateResponse.StatusCode);
+            }
+        }
+        [Fact]
+        public async Task Test_deleteOneFalse_ProductType()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                /*
+                    ACT
+                */
+                var newResponse = await client.DeleteAsync("/api/producttype/1000");
+
+
+                string newResponseBody = await newResponse.Content.ReadAsStringAsync();
+
+                Assert.Equal(HttpStatusCode.NotFound, newResponse.StatusCode);
             }
         }
     }

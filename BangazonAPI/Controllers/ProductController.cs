@@ -37,7 +37,11 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = "SELECT Id, ProductTypeId, CustomerId, Title, Price, Description, Quantity FROM Product";
+                    
+                    cmd.CommandText = "SELECT * FROM Product p " +
+                        "LEFT JOIN ProductType pt ON p.ProductTypeId = pt.Id " +
+                        "LEFT JOIN Customer c ON p.CustomerId = c.Id";
+
                     SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
                     List<Product> products = new List<Product>();
@@ -51,9 +55,20 @@ namespace BangazonAPI.Controllers
                             Title = reader.GetString(reader.GetOrdinal("Title")),
                             Price = reader.GetDecimal(reader.GetOrdinal("Price")),
                             Description = reader.GetString(reader.GetOrdinal("Description")),
-                           Quantity = reader.GetInt32(reader.GetOrdinal("Quantity"))
-    };
-                       products.Add(product);
+                            Quantity = reader.GetInt32(reader.GetOrdinal("Quantity")),
+                            productType = new ProductType
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                            },
+                            SellingCustomer = new Customer
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                            }
+                        };
+                        products.Add(product);
                     }
                     reader.Close();
 
