@@ -103,7 +103,7 @@ namespace TestBangazonAPI
             using (var client = new APIClientProvider().Client)
             {
                 var response = await client.DeleteAsync($"/api/computers/5");
-                Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+                Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             }
 
         }
