@@ -12,7 +12,6 @@ namespace TestBangazonAPI
 {
     public class TestProducts
     {
-
         [Fact]
         public async Task Test_Get_All_Products()
         {
