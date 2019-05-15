@@ -18,11 +18,6 @@ namespace TestBangazonAPI
             using (var client = new APIClientProvider().Client)
             {
                 /*
-                    ARRANGE
-                */
-
-
-                /*
                     ACT
                 */
                 var response = await client.GetAsync("/api/producttype");
@@ -55,7 +50,7 @@ namespace TestBangazonAPI
                 /*
                     ACT
                 */
-                var response = await client.PostAsync($"/api/producttype/",
+                var response = await client.PostAsync("/api/producttype/",
                     new StringContent(newProductAsJSON, Encoding.UTF8, "application/json"));
 
 
@@ -80,17 +75,10 @@ namespace TestBangazonAPI
         {
             using (var client = new APIClientProvider().Client)
             {
-
-                /* GET ONE PRODUCT TYPE */
-                /*
-                    ARRANGE
-                */
-
-
                 /*
                     ACT
                 */
-                var getResponse = await client.GetAsync($"/api/producttype/2");
+                var getResponse = await client.GetAsync("/api/producttype/2");
 
 
                 string getResponseBody = await getResponse.Content.ReadAsStringAsync();
@@ -108,7 +96,6 @@ namespace TestBangazonAPI
         {
             using (var client = new APIClientProvider().Client)
             {
-                /* UPDATE CREATION */
                 /*
                    ARRANGE
                */
@@ -121,7 +108,7 @@ namespace TestBangazonAPI
             /*
                 ACT
             */
-            var updateResponse = await client.PutAsync($"/api/producttype/1",
+            var updateResponse = await client.PutAsync("/api/producttype/1",
                 new StringContent(updateProductAsJSON, Encoding.UTF8, "application/json"));
 
 
@@ -129,7 +116,7 @@ namespace TestBangazonAPI
 
             Assert.Equal(HttpStatusCode.NoContent, updateResponse.StatusCode);
 
-            var getDogSocks = await client.GetAsync($"/api/producttype/1");
+            var getDogSocks = await client.GetAsync("/api/producttype/1");
             getDogSocks.EnsureSuccessStatusCode();
 
             string getDogSocksBody = await getDogSocks.Content.ReadAsStringAsync();
@@ -145,14 +132,9 @@ namespace TestBangazonAPI
             using (var client = new APIClientProvider().Client)
             {
                 /*
-                    ARRANGE
-                */
-
-
-                /*
                     ACT
                 */
-                var response = await client.GetAsync($"/api/producttype/1000");
+                var response = await client.GetAsync("/api/producttype/1000");
 
 
                 string responseBody = await response.Content.ReadAsStringAsync();
@@ -169,8 +151,6 @@ namespace TestBangazonAPI
         {
             using (var client = new APIClientProvider().Client)
             {
-
-                /* UPDATE FALSE CREATION */
                 /*
                    ARRANGE
                */
@@ -183,7 +163,7 @@ namespace TestBangazonAPI
                 /*
                     ACT
                 */
-                var falseUpdateResponse = await client.PutAsync($"/api/producttype/1000",
+                var falseUpdateResponse = await client.PutAsync("/api/producttype/1000",
                     new StringContent(falseUpdateProductAsJSON, Encoding.UTF8, "application/json"));
 
 
@@ -197,17 +177,10 @@ namespace TestBangazonAPI
         {
             using (var client = new APIClientProvider().Client)
             {
-
-                /* DELETE FALSE CREATION*/
-                /*
-                    ARRANGE
-                */
-                
-
                 /*
                     ACT
                 */
-                var newResponse = await client.DeleteAsync($"/api/producttype/1000");
+                var newResponse = await client.DeleteAsync("/api/producttype/1000");
 
 
                 string newResponseBody = await newResponse.Content.ReadAsStringAsync();

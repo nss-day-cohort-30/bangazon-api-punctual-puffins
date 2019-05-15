@@ -49,7 +49,6 @@ namespace BangazonAPI.Controllers
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             Name = reader.GetString(reader.GetOrdinal("Name")),
-                            // You might have more columns
                         };
 
                         productTypes.Add(productType);
@@ -86,7 +85,6 @@ namespace BangazonAPI.Controllers
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             Name = reader.GetString(reader.GetOrdinal("Name")),
-                            // You might have more columns
                         };
                     }
 
@@ -106,7 +104,6 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    // More string interpolation
                     cmd.CommandText = @"
                         INSERT INTO ProductType (Name)
                         OUTPUT INSERTED.Id
@@ -204,7 +201,6 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    // More string interpolation
                     cmd.CommandText = "SELECT Id FROM ProductType WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
 
