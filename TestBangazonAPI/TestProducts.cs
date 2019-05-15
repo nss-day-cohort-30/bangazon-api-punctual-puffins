@@ -1,4 +1,3 @@
-using System;
 using System.Net;
 using Newtonsoft.Json;
 using Xunit;
@@ -47,7 +46,9 @@ namespace TestBangazonAPI
                 Assert.Equal(23.3000M, product.Price);
                 Assert.Equal("super big frying pan", product.Title);
                 Assert.Equal("jstainless steel frying pan 12 in", product.Description);
-                Assert.Equal(1, product.Quantity);
+                Assert.Equal("Coffee Pot", product.productType.Name);
+                Assert.Equal("Sam", product.SellingCustomer.FirstName);
+                Assert.Equal("Cronin", product.SellingCustomer.LastName);
                 Assert.NotNull(product);
             }
         }

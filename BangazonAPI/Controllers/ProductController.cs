@@ -47,23 +47,27 @@ namespace BangazonAPI.Controllers
                     List<Product> products = new List<Product>();
                     while (reader.Read())
                     {
+
+                        int productTypeId = reader.GetInt32(reader.GetOrdinal("ProductTypeId"));
+                        int customerId = reader.GetInt32(reader.GetOrdinal("CustomerId"));
+
                         Product product = new Product
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            ProductTypeId = reader.GetInt32(reader.GetOrdinal("ProductTypeId")),
-                            CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
+                            ProductTypeId = productTypeId,
+                            CustomerId = customerId,
                             Title = reader.GetString(reader.GetOrdinal("Title")),
                             Price = reader.GetDecimal(reader.GetOrdinal("Price")),
                             Description = reader.GetString(reader.GetOrdinal("Description")),
                             Quantity = reader.GetInt32(reader.GetOrdinal("Quantity")),
                             productType = new ProductType
                             {
-                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Id = productTypeId,
                                 Name = reader.GetString(reader.GetOrdinal("Name")),
                             },
                             SellingCustomer = new Customer
                             {
-                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Id = customerId,
                                 FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                                 LastName = reader.GetString(reader.GetOrdinal("LastName")),
                             }
@@ -81,7 +85,6 @@ namespace BangazonAPI.Controllers
         [HttpGet("{id}", Name = "GetProduct")]
         public async Task<IActionResult> Get(int id)
         {
-
             if (!ProductExists(id))
             {
                 return new StatusCodeResult(StatusCodes.Status404NotFound);
@@ -91,22 +94,39 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT Id, ProductTypeId,  CustomerId, Title, Price, Description, Quantity FROM Product WHERE Id = @id";
+                    cmd.CommandText = @"SELECT * FROM Product p " +
+                        "LEFT JOIN ProductType pt ON p.ProductTypeId = pt.Id " +
+                        "LEFT JOIN Customer c ON p.CustomerId = c.Id" +
+                        " WHERE p.Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
                     Product product = null;
                     if (reader.Read())
                     {
+                        int productTypeId = reader.GetInt32(reader.GetOrdinal("ProductTypeId"));
+                        int customerId = reader.GetInt32(reader.GetOrdinal("CustomerId"));
+
                         product = new Product
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            ProductTypeId = reader.GetInt32(reader.GetOrdinal("ProductTypeId")),
-                            CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
+                            ProductTypeId = productTypeId,
+                            CustomerId = customerId,
                             Title = reader.GetString(reader.GetOrdinal("Title")),
                             Price = reader.GetDecimal(reader.GetOrdinal("Price")),
                             Description = reader.GetString(reader.GetOrdinal("Description")),
-                            Quantity = reader.GetInt32(reader.GetOrdinal("Quantity"))
+                            Quantity = reader.GetInt32(reader.GetOrdinal("Quantity")),
+                            productType = new ProductType
+                            {
+                                Id = productTypeId,
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                            },
+                            SellingCustomer = new Customer
+                            {
+                                Id = customerId,
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                            }
                         };
                     }
                     reader.Close();
@@ -125,7 +145,6 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    
                     cmd.CommandText = @"
                         INSERT INTO Product (ProductTypeId, CustomerId, Title, Price, Description, Quantity)
                         OUTPUT INSERTED.Id
