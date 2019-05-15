@@ -12,8 +12,8 @@ namespace BangazonAPI.Models
         public int Id { get; set; }
 
         [Required]
-        public DateTime PurachseDate { get; set; }
-        public DateTime DecommisionDate { get; set; }
+        public DateTime PurchaseDate { get; set; }
+        public DateTime DecomissionDate { get; set; }
         [Required]
         [StringLength(55)]
         public String Make { get; set; }
