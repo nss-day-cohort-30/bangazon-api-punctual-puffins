@@ -70,7 +70,7 @@ namespace BangazonAPI.Controllers
                                     Id = reader.GetInt32(reader.GetOrdinal("Id")),
                                     Name = reader.GetString(reader.GetOrdinal("Name")),
                                     Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
-                                    // You might have more columns
+                                   
                                 };
                                 HashTable[DeptId] = dept;
                             };
