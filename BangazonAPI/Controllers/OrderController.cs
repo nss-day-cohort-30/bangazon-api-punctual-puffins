@@ -116,7 +116,7 @@ namespace BangazonAPI.Controllers
                                     Price = reader.GetDecimal(reader.GetOrdinal("Price")),
                                     Quantity = reader.GetInt32(reader.GetOrdinal("Quantity")),
                                     ProductTypeId = reader.GetInt32(reader.GetOrdinal("PtId")),
-                                    ProductType = new ProductType
+                                    productType = new ProductType
                                     {
                                         Id = reader.GetInt32(reader.GetOrdinal("PtId")),
                                         Name = reader.GetString(reader.GetOrdinal("PType"))
@@ -269,7 +269,7 @@ namespace BangazonAPI.Controllers
                                     Price = reader.GetDecimal(reader.GetOrdinal("Price")),
                                     Quantity = reader.GetInt32(reader.GetOrdinal("Quantity")),
                                     ProductTypeId = reader.GetInt32(reader.GetOrdinal("PtId")),
-                                    ProductType = new ProductType
+                                    productType = new ProductType
                                     {
                                         Id = reader.GetInt32(reader.GetOrdinal("PtId")),
                                         Name = reader.GetString(reader.GetOrdinal("PType"))
