@@ -31,7 +31,7 @@ namespace BangazonAPI.Controllers
 
         // GET api/values
         [HttpGet]
-        public async Task<IActionResult> Get(string _filter, string _include, bool completed )
+        public async Task<IActionResult> Get(string _include, bool completed )
         {
             using (SqlConnection conn = Connection)
             {
@@ -210,6 +210,110 @@ namespace BangazonAPI.Controllers
                         }
                     }
 
+                }
+            }
+        }
+
+        [HttpGet("{id}", Name = "GetOrder")]
+        public async Task<IActionResult> Get(int id)
+        {
+            if (OrderExists(id))
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+
+
+                        cmd.CommandText = @"SELECT o.Id,
+                                                o.CustomerId CustId,
+                                                o.PaymentTypeId,
+                                                op.Id opId, 
+                                                op.ProductId ProdId, 
+                                                p.Title, 
+                                                p.Quantity, 
+                                                p.[Description] Descrip, 
+                                                pt.[Name] PType,
+                                                p.ProductTypeId PtId,
+                                                p.Price
+                                            FROM [Order] o Left Join orderProduct op on o.Id = op.OrderId
+                                            LEFT JOIN Product p ON p.Id = op.ProductId
+                                            LEFT JOIN ProductType pt ON op.ProductId = pt.Id
+                                            WHERE o.Id = @custId";
+                        cmd.Parameters.Add(new SqlParameter("@custId", id));
+                        SqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+                        Dictionary<int, Order> HashTable = new Dictionary<int, Order>();
+                        while (reader.Read())
+                        {
+                            int orderId = reader.GetInt32(reader.GetOrdinal("Id"));
+                            if (!HashTable.ContainsKey(orderId))
+                            {
+                                Order order = new Order
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    CustomerId = reader.GetInt32(reader.GetOrdinal("CustId")),
+                                    PaymentTypeId = reader.IsDBNull(reader.GetOrdinal("PaymentTypeId")) == true ? 0 : reader.GetInt32(reader.GetOrdinal("PaymentTypeId"))
+                                };
+                                HashTable[orderId] = order;
+                            };
+                            if (!reader.IsDBNull(reader.GetOrdinal("opId")))
+                            {
+
+                                Product product = new Product
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("ProdId")),
+                                    Title = reader.GetString(reader.GetOrdinal("Title")),
+                                    Description = reader.GetString(reader.GetOrdinal("Descrip")),
+                                    Price = reader.GetDecimal(reader.GetOrdinal("Price")),
+                                    Quantity = reader.GetInt32(reader.GetOrdinal("Quantity")),
+                                    ProductTypeId = reader.GetInt32(reader.GetOrdinal("PtId")),
+                                    ProductType = new ProductType
+                                    {
+                                        Id = reader.GetInt32(reader.GetOrdinal("PtId")),
+                                        Name = reader.GetString(reader.GetOrdinal("PType"))
+                                    }
+                                };
+                                HashTable[orderId].Products.Add(product);
+                            }
+                        }
+
+                        reader.Close();
+                        return Ok(HashTable[id]);
+                    }
+                }
+            }
+
+            else
+            {
+                return new StatusCodeResult(StatusCodes.Status404NotFound);
+            }
+                
+            
+        }
+
+
+        // POST api/values
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] Order order)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                
+                    cmd.CommandText = @"
+                        INSERT INTO [Order] (CustomerId) 
+                        OUTPUT INSERTED.Id
+                        VALUES (@custId)
+                    ";
+                    cmd.Parameters.Add(new SqlParameter("@custId", order.CustomerId));
+
+                    order.Id = (int)await cmd.ExecuteScalarAsync();
+
+                    return CreatedAtRoute("GetOrder", new { id = order.Id }, order);
                 }
             }
         }
