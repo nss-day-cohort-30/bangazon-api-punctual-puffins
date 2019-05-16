@@ -193,5 +193,44 @@ namespace TestBangazonAPI
                 Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
             }
         }
+
+        [Fact]
+        public async Task Test_Update_Order()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                //Checking Update
+
+                Order UpdateToNewOrder = new Order
+                {
+                    PaymentTypeId =1
+                   
+                };
+                var newDeptJSON = JsonConvert.SerializeObject(UpdateToNewOrder);
+
+
+                var response = await client.PutAsync(
+                            $"api/Order/3",
+                            new StringContent(newDeptJSON, Encoding.UTF8, "application/json")
+                        );
+                response.EnsureSuccessStatusCode();
+                var responseBody = await response.Content.ReadAsStringAsync();
+
+                Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+
+
+                //  GET single department 
+
+                var getNewOrder = await client.GetAsync($"/api/Order/3");
+                getNewOrder.EnsureSuccessStatusCode();
+
+                string getNewOrderBody = await getNewOrder.Content.ReadAsStringAsync();
+                Order newOrder = JsonConvert.DeserializeObject<Order>(getNewOrderBody);
+
+                Assert.Equal(HttpStatusCode.OK, getNewOrder.StatusCode);
+                Assert.Equal(1, newOrder.PaymentTypeId);
+            }
+        }
+
     }
 }
