@@ -8,7 +8,6 @@ using BangazonAPI.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-
 namespace BangazonAPI.Controllers
 {
     [Route("api/[controller]")]
@@ -16,12 +15,10 @@ namespace BangazonAPI.Controllers
     public class ProductTypeController : ControllerBase
     {
         private readonly IConfiguration _config;
-
         public ProductTypeController(IConfiguration config)
         {
             _config = config;
         }
-
         private SqlConnection Connection
         {
             get
@@ -29,7 +26,6 @@ namespace BangazonAPI.Controllers
                 return new SqlConnection(_config.GetConnectionString("DefaultConnection"));
             }
         }
-
         // GET api/values
         [HttpGet]
         public async Task<IActionResult> Get()
@@ -41,7 +37,6 @@ namespace BangazonAPI.Controllers
                 {
                     cmd.CommandText = "SELECT Id, Name FROM ProductType";
                     SqlDataReader reader = await cmd.ExecuteReaderAsync();
-
                     List<ProductType> productTypes = new List<ProductType>();
                     while (reader.Read())
                     {
@@ -50,17 +45,13 @@ namespace BangazonAPI.Controllers
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             Name = reader.GetString(reader.GetOrdinal("Name")),
                         };
-
                         productTypes.Add(productType);
                     }
-
                     reader.Close();
-
                     return Ok(productTypes);
                 }
             }
         }
-
         // GET api/values/5
         [HttpGet("{id}", Name = "GetProductType")]
         public async Task<IActionResult> Get(int id)
@@ -77,7 +68,6 @@ namespace BangazonAPI.Controllers
                     cmd.CommandText = "SELECT Id, Name FROM ProductType WHERE @id = ProductType.Id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = await cmd.ExecuteReaderAsync();
-
                     ProductType productType = null;
                     if (reader.Read())
                     {
@@ -87,14 +77,11 @@ namespace BangazonAPI.Controllers
                             Name = reader.GetString(reader.GetOrdinal("Name")),
                         };
                     }
-
                     reader.Close();
-
                     return Ok(productType);
                 }
             }
         }
-
         // POST api/values
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] ProductType productType)
@@ -110,16 +97,12 @@ namespace BangazonAPI.Controllers
                         VALUES (@name)
                     ";
                     cmd.Parameters.Add(new SqlParameter("@name", productType.Name));
-
                     int newId = (int)await cmd.ExecuteScalarAsync();
-
                     productType.Id = newId;
-
                     return CreatedAtRoute("GetProductType", new { id = newId }, productType);
                 }
             }
         }
-
         // PUT api/values/5
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] ProductType productType)
@@ -138,14 +121,11 @@ namespace BangazonAPI.Controllers
                         ";
                         cmd.Parameters.Add(new SqlParameter("@id", id));
                         cmd.Parameters.Add(new SqlParameter("@name", productType.Name));
-
                         int rowsAffected = await cmd.ExecuteNonQueryAsync();
-
                         if (rowsAffected > 0)
                         {
                             return new StatusCodeResult(StatusCodes.Status204NoContent);
                         }
-
                         throw new Exception("No rows affected");
                     }
                 }
@@ -162,7 +142,6 @@ namespace BangazonAPI.Controllers
                 }
             }
         }
-
         // DELETE api/values/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
@@ -178,21 +157,15 @@ namespace BangazonAPI.Controllers
                 {
                     cmd.CommandText = "DELETE FROM ProductType WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
-
                     int rowsAffected = await cmd.ExecuteNonQueryAsync();
-
                     if (rowsAffected > 0)
                     {
                         return new StatusCodeResult(StatusCodes.Status204NoContent);
                     }
-
                     throw new Exception("No rows affected");
                 }
             }
         }
-    
-
-
 
         private bool ProductTypeExists(int id)
         {
@@ -203,9 +176,7 @@ namespace BangazonAPI.Controllers
                 {
                     cmd.CommandText = "SELECT Id FROM ProductType WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
-
                     SqlDataReader reader = cmd.ExecuteReader();
-
                     return reader.Read();
                 }
             }
