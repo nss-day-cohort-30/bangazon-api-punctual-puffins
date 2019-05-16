@@ -38,7 +38,7 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = "SELECT Id, Name, AccountNumber FROM PaymentType";
+                    cmd.CommandText = "SELECT Id, Name, AcctNumber FROM PaymentType";
                     SqlDataReader reader = await cmd.ExecuteReaderAsync();
                     List<PaymentType> paymenttypes = new List<PaymentType>();
 
@@ -48,7 +48,7 @@ namespace BangazonAPI.Controllers
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             Name = reader.GetString(reader.GetOrdinal("Name")),
-                            AccountNumber = reader.GetInt32(reader.GetOrdinal("AccountNumber"))
+                            AcctNumber = reader.GetInt32(reader.GetOrdinal("AcctNumber"))
                         };
 
                         paymenttypes.Add(paymenttype);
@@ -74,7 +74,7 @@ namespace BangazonAPI.Controllers
                 {
                     cmd.CommandText = @"
                         SELECT
-                        Id, Name, AccountNumber
+                        Id, Name, AcctNumber
                         FROM PaymentType
                         WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
@@ -88,7 +88,7 @@ namespace BangazonAPI.Controllers
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             Name = reader.GetString(reader.GetOrdinal("Name")),
-                            AccountNumber = reader.GetInt32(reader.GetOrdinal("AccountNumber"))
+                            AcctNumber = reader.GetInt32(reader.GetOrdinal("AcctNumber"))
                         };
                     }
                     reader.Close();
@@ -106,11 +106,11 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"INSERT INTO PaymentType (Name, AccountNumber)
+                    cmd.CommandText = @"INSERT INTO PaymentType (Name, AcctNumber)
                                         OUTPUT INSERTED.Id
-                                        VALUES (@name, @AccountNumber)";
+                                        VALUES (@name, @AcctNumber)";
                     cmd.Parameters.Add(new SqlParameter("@name", paymenttype.Name));
-                    cmd.Parameters.Add(new SqlParameter("@AccountNumber", paymenttype.AccountNumber));
+                    cmd.Parameters.Add(new SqlParameter("@AcctNumber", paymenttype.AcctNumber));
 
                     int newId = (int)await cmd.ExecuteScalarAsync();
                     paymenttype.Id = newId;
@@ -131,10 +131,10 @@ namespace BangazonAPI.Controllers
                     {
                         cmd.CommandText = @"UPDATE PaymentType
                                             SET Name = @name,
-                                            AccountNumber = @AccountNumber
+                                            AcctNumber = @AcctNumber
                                             WHERE Id = @id";
                         cmd.Parameters.Add(new SqlParameter("@name", paymenttype.Name));
-                        cmd.Parameters.Add(new SqlParameter("@AccountNumber", paymenttype.AccountNumber));
+                        cmd.Parameters.Add(new SqlParameter("@AcctNumber", paymenttype.AcctNumber));
                         cmd.Parameters.Add(new SqlParameter("@id", id));
 
                         int rowsAffected = await cmd.ExecuteNonQueryAsync();
@@ -202,7 +202,7 @@ namespace BangazonAPI.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        SELECT Id, Name, AccountNumber
+                        SELECT Id, Name, AcctNumber
                         FROM PaymentType
                         WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));

@@ -11,160 +11,160 @@ using Microsoft.AspNetCore.Http;
 
 namespace TestBangazonAPI
 {
-    public class TestDepartment
+    public class TestPaymentType
     {
 
         [Fact]
-        public async Task Test_Get_Single_Department()
+        public async Task Test_Get_Single_PaymentType()
         {
 
-            using (var department = new APIClientProvider().Client)
+            using (var paymenttypes = new APIClientProvider().Client)
             {
-                var response = await department.GetAsync("/api/Department/2");
+                var response = await paymenttypes.GetAsync("paymenttype/1");
 
                 response.EnsureSuccessStatusCode();
 
                 string responseBody = await response.Content.ReadAsStringAsync();
-                var departmentResponse = JsonConvert.DeserializeObject<Department>(responseBody);
+                var paymenttypeResponse = JsonConvert.DeserializeObject<PaymentType>(responseBody);
 
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal("IT", departmentResponse.Name);
-                Assert.NotNull(departmentResponse);
+                Assert.Equal("Ryan Nelson", paymenttypeResponse.Name);
+                Assert.NotNull(paymenttypeResponse);
             }
         }
         [Fact]
-        public async Task Test_Get_All_Departments()
+        public async Task Test_Get_All_PaymentTypes()
         {
             using (var client = new APIClientProvider().Client)
             {
-                var response = await client.GetAsync("/api/Department");
+                var response = await client.GetAsync("/paymenttype");
 
 
                 string responseBody = await response.Content.ReadAsStringAsync();
-                var departments = JsonConvert.DeserializeObject<List<Department>>(responseBody);
+                var paymenttypes = JsonConvert.DeserializeObject<List<PaymentType>>(responseBody);
 
                 /*
                     ASSERT
                 */
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                Assert.True(departments.Count > 0);
+                Assert.True(paymenttypes.Count > 0);
             }
         }
         // get all department with employees
         [Fact]
-        public async Task Test_Get_All_Departments_with_Employees()
+        public async Task Test_Get_All_PaymentTypes_with_Names()
         {
             using (var client = new APIClientProvider().Client)
             {
-                var response = await client.GetAsync("/api/Department?_include=employees");
+                var response = await client.GetAsync("/paymenttype?_include=names");
 
 
                 string responseBody = await response.Content.ReadAsStringAsync();
-                var departments = JsonConvert.DeserializeObject<List<Department>>(responseBody);
+                var paymenttypes = JsonConvert.DeserializeObject<List<PaymentType>>(responseBody);
 
                 /*
                     ASSERT
                 */
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                Assert.True(departments.Count > 0);
+                Assert.True(paymenttypes.Count > 0);
             }
         }
 
         //with budget with gt
         [Fact]
-        public async Task Test_Get_All_Departments_with_Filter_Budget()
+        public async Task Test_Get_All_PaymentTypes_with_Filter_AcctNumber()
         {
             using (var client = new APIClientProvider().Client)
             {
-                var response = await client.GetAsync("/api/Department?_filter=budget&_gt=30000");
+                var response = await client.GetAsync("/paymenttype?_filter=AcctNumber&_gt=123123");
 
 
                 string responseBody = await response.Content.ReadAsStringAsync();
-                var departments = JsonConvert.DeserializeObject<List<Department>>(responseBody);
+                var paymenttypes = JsonConvert.DeserializeObject<List<PaymentType>>(responseBody);
 
                 /*
                     ASSERT
                 */
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                Assert.True(departments.Count > 0);
+                Assert.True(paymenttypes.Count > 0);
             }
         }
         //with budget with gt and with employees
         [Fact]
-        public async Task Test_Get_All_Departments_with_Filter_Budget_and_employee()
+        public async Task Test_Get_All_PaymentTypes_with_Filter_AcctNumber_and_Names()
         {
             using (var client = new APIClientProvider().Client)
             {
-                var response = await client.GetAsync("/api/Department?_filter=budget&_gt=30000&_include=employees");
+                var response = await client.GetAsync("/paymenttype?_filter=AcctNumber&_gt=123123&_include=Names");
 
 
                 string responseBody = await response.Content.ReadAsStringAsync();
-                var departments = JsonConvert.DeserializeObject<List<Department>>(responseBody);
+                var paymenttypes = JsonConvert.DeserializeObject<List<PaymentType>>(responseBody);
 
                 /*
                     ASSERT
                 */
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                Assert.True(departments.Count > 0);
+                Assert.True(paymenttypes.Count > 0);
             }
         }
 
 
 
         [Fact]
-        public async Task Test_Create_And_Delete_Department()
+        public async Task Test_Create_And_Delete_PaymentType()
         {
             using (var client = new APIClientProvider().Client)
             {
-                Department dept = new Department
+                PaymentType paymenttype = new PaymentType
                 {
-                    Name = "TestDept",
-                    Budget = 200
+                    Name = "Ryan Nelson",
+                    AcctNumber = 123123
                 };
-                var testDeptJSON = JsonConvert.SerializeObject(dept);
+                var testpaymenttypeJSON = JsonConvert.SerializeObject(paymenttype);
 
                 var response = await client.PostAsync(
 
-                    "/api/Department",
-                    new StringContent(testDeptJSON, Encoding.UTF8, "application/json")
+                    "/paymenttype",
+                    new StringContent(testpaymenttypeJSON, Encoding.UTF8, "application/json")
                 );
 
                 response.EnsureSuccessStatusCode();
 
                 string responseBody = await response.Content.ReadAsStringAsync();
-                var newDept = JsonConvert.DeserializeObject<Department>(responseBody);
+                var newpaymenttype = JsonConvert.DeserializeObject<PaymentType>(responseBody);
 
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-                Assert.Equal("TestDept", newDept.Name);
-                Assert.Equal(200, newDept.Budget);
+                Assert.Equal("Ryan Nelson", newpaymenttype.Name);
+                Assert.Equal(123123, newpaymenttype.AcctNumber);
 
 
 
                 //Checking Delete Part
-                var deleteResponse = await client.DeleteAsync($"/api/Department/{newDept.Id}");
+                var deleteResponse = await client.DeleteAsync($"/paymenttype/{newpaymenttype.Id}");
                 deleteResponse.EnsureSuccessStatusCode();
                 Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
             }
         }
 
         [Fact]
-        public async Task Test_Update_Department()
+        public async Task Test_Update_PaymentType()
         {
             using (var client = new APIClientProvider().Client)
             {
                 //Checking Update
 
-                Department UpdateToNewDept = new Department
+                PaymentType UpdateToNewPaymentType = new PaymentType
                 {
-                    Name = "Customer Service",
-                    Budget = 500
+                    Name = "Ryan Nelson",
+                    AcctNumber = 123123
                 };
-                var newDeptJSON = JsonConvert.SerializeObject(UpdateToNewDept);
+                var newpaymenttypeJSON = JsonConvert.SerializeObject(UpdateToNewPaymentType);
 
 
                 var response = await client.PutAsync(
-                            $"api/Department/1",
-                            new StringContent(newDeptJSON, Encoding.UTF8, "application/json")
+                            $"/paymenttype/1",
+                            new StringContent(newpaymenttypeJSON, Encoding.UTF8, "application/json")
                         );
                 response.EnsureSuccessStatusCode();
                 var responseBody = await response.Content.ReadAsStringAsync();
@@ -174,47 +174,47 @@ namespace TestBangazonAPI
 
                 //  GET single department 
 
-                var getNewDept = await client.GetAsync($"/api/Department/1");
-                getNewDept.EnsureSuccessStatusCode();
+                var getNewpaymenttype = await client.GetAsync($"/paymenttype/1");
+                getNewpaymenttype.EnsureSuccessStatusCode();
 
-                string getNewDeptBody = await getNewDept.Content.ReadAsStringAsync();
-                Department newDept = JsonConvert.DeserializeObject<Department>(getNewDeptBody);
+                string getNewpaymenttypeBody = await getNewpaymenttype.Content.ReadAsStringAsync();
+                PaymentType newpaymenttype = JsonConvert.DeserializeObject<PaymentType>(getNewpaymenttypeBody);
 
-                Assert.Equal(HttpStatusCode.OK, getNewDept.StatusCode);
-                Assert.Equal("Customer Service", newDept.Name);
+                Assert.Equal(HttpStatusCode.OK, getNewpaymenttype.StatusCode);
+                Assert.Equal("Ryan Nelson", newpaymenttype.Name);
             }
         }
 
         [Fact]
-        public async Task Test_Non_Existing_Get_Update_And_Delete_Department()
+        public async Task Test_Non_Existing_Get_Update_And_Delete_PaymentType()
         {
-            using (var department = new APIClientProvider().Client)
+            using (var paymenttype = new APIClientProvider().Client)
             {
 
-                var response = await department.GetAsync("/api/Department/99999");
+                var response = await paymenttype.GetAsync("/paymenttype/99999");
 
                 Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
 
 
 
                 //Checking Update
-                Department UpdateToNewDept = new Department
+                PaymentType UpdateToNewpaymenttype = new PaymentType
                 {
-                    Name = "New Dept",
-                    Budget = 500
+                    Name = "Ryan Nelson",
+                    AcctNumber = 123123
                 };
-                var newDeptJSON = JsonConvert.SerializeObject(UpdateToNewDept);
+                var newpaymenttypeJSON = JsonConvert.SerializeObject(UpdateToNewpaymenttype);
 
 
-                response = await department.PutAsync(
-                    $"api/Department/99999",
-                    new StringContent(newDeptJSON, Encoding.UTF8, "application/json")
+                response = await paymenttype.PutAsync(
+                    $"paymenttype/99999",
+                    new StringContent(newpaymenttypeJSON, Encoding.UTF8, "application/json")
                 );
                 Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
 
 
                 //Checking Delete Part
-                var deleteResponse = await department.DeleteAsync($"/api/Department/99999");
+                var deleteResponse = await paymenttype.DeleteAsync($"/paymenttype/99999");
                 Assert.Equal(HttpStatusCode.NotFound, deleteResponse.StatusCode);
             }
         }
