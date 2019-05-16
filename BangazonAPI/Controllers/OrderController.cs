@@ -31,7 +31,7 @@ namespace BangazonAPI.Controllers
 
         // GET api/values
         [HttpGet]
-        public async Task<IActionResult> Get(string _include, bool completed )
+        public async Task<IActionResult> Get(string _include, bool? completed )
         {
             using (SqlConnection conn = Connection)
             {
