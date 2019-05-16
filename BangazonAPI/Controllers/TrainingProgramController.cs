@@ -303,7 +303,7 @@ namespace BangazonAPI.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     // More string interpolation
-                    cmd.CommandText = "SELECT Id FROM Department WHERE Id = @id";
+                    cmd.CommandText = "SELECT Id FROM TrainingProgram WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
 
                     SqlDataReader reader = cmd.ExecuteReader();
