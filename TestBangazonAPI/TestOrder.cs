@@ -69,24 +69,24 @@ namespace TestBangazonAPI
                 Assert.True(orders.Count > 0);
             }
         }
-        [Fact]
-        public async Task Test_Get_All_Order_with_Products()
-        {
-            using (var client = new APIClientProvider().Client)
-            {
-                var response = await client.GetAsync("/api/Order?_include=products");
+        //[Fact]
+        //public async Task Test_Get_All_Order_with_Products()
+        //{
+        //    using (var client = new APIClientProvider().Client)
+        //    {
+        //        var response = await client.GetAsync("/api/Order?_include=products");
 
 
-                string responseBody = await response.Content.ReadAsStringAsync();
-                var orders = JsonConvert.DeserializeObject<List<Order>>(responseBody);
+        //        string responseBody = await response.Content.ReadAsStringAsync();
+        //        var orders = JsonConvert.DeserializeObject<List<Order>>(responseBody);
 
-                /*
-                    ASSERT
-                */
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                Assert.True(orders.Count > 0);
-            }
-        }
+        //        /*
+        //            ASSERT
+        //        */
+        //        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        //        Assert.True(orders.Count > 0);
+        //    }
+        //}
 
         //Get all Completed orders
         [Fact]
