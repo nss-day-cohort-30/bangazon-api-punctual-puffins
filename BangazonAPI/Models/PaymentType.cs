@@ -17,5 +17,7 @@ namespace BangazonAPI.Models
         [StringLength(55)]
         public string Name { get; set; }
 
+        public int CustomerId { get; set; }
+
     }
 }

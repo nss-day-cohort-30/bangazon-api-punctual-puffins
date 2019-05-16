@@ -90,12 +90,32 @@ namespace TestBangazonAPI
             }
         }
         //with budget with gt and with employees
+
         [Fact]
-        public async Task Test_Get_All_PaymentTypes_with_Filter_AcctNumber_and_Names()
+        public async Task Test_Get_All_PaymentTypes_with_Filter_CustomerId()
         {
             using (var client = new APIClientProvider().Client)
             {
-                var response = await client.GetAsync("/paymenttype?_filter=AcctNumber&_gt=123123&_include=Names");
+                var response = await client.GetAsync("/paymenttype?_filter=CustomerId&_gt=1");
+
+
+                string responseBody = await response.Content.ReadAsStringAsync();
+                var paymenttypes = JsonConvert.DeserializeObject<List<PaymentType>>(responseBody);
+
+                /*
+                    ASSERT
+                */
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.True(paymenttypes.Count > 0);
+            }
+        }
+        //with budget with gt and with employees
+        [Fact]
+        public async Task Test_Get_All_PaymentTypes_with_Filter_AcctNumber_Names_and_CustomerId()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                var response = await client.GetAsync("/paymenttype?_filter=AcctNumber&_gt=123123&_include=Names_CustomerId&_gt=1");
 
 
                 string responseBody = await response.Content.ReadAsStringAsync();
@@ -119,7 +139,8 @@ namespace TestBangazonAPI
                 PaymentType paymenttype = new PaymentType
                 {
                     Name = "Ryan Nelson",
-                    AcctNumber = 123123
+                    AcctNumber = 123123,
+                    CustomerId = 1
                 };
                 var testpaymenttypeJSON = JsonConvert.SerializeObject(paymenttype);
 
@@ -137,6 +158,7 @@ namespace TestBangazonAPI
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
                 Assert.Equal("Ryan Nelson", newpaymenttype.Name);
                 Assert.Equal(123123, newpaymenttype.AcctNumber);
+                Assert.Equal(1, newpaymenttype.CustomerId);
 
 
 
@@ -157,7 +179,8 @@ namespace TestBangazonAPI
                 PaymentType UpdateToNewPaymentType = new PaymentType
                 {
                     Name = "Ryan Nelson",
-                    AcctNumber = 123123
+                    AcctNumber = 123123,
+                    CustomerId = 1
                 };
                 var newpaymenttypeJSON = JsonConvert.SerializeObject(UpdateToNewPaymentType);
 
@@ -201,7 +224,8 @@ namespace TestBangazonAPI
                 PaymentType UpdateToNewpaymenttype = new PaymentType
                 {
                     Name = "Ryan Nelson",
-                    AcctNumber = 123123
+                    AcctNumber = 123123,
+                    CustomerId = 1
                 };
                 var newpaymenttypeJSON = JsonConvert.SerializeObject(UpdateToNewpaymenttype);
 
