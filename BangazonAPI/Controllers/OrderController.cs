@@ -72,9 +72,8 @@ namespace BangazonAPI.Controllers
                         return Ok(orders);
                     }
                     else
-                   if (_include == "products")
-                    {
-                        cmd.CommandText = @"SELECT o.Id,
+                    { 
+                         cmd.CommandText = @"SELECT o.Id,
                                                 o.CustomerId CustId,
                                                 o.PaymentTypeId,
                                                 op.Id opId, 
@@ -87,8 +86,19 @@ namespace BangazonAPI.Controllers
                                                 p.Price
                                             FROM [Order] o Left Join orderProduct op on o.Id = op.OrderId
                                             JOIN Product p ON p.Id = op.ProductId
-                                            JOIN ProductType pt ON op.ProductId = pt.Id";
-
+                                            JOIN ProductType pt ON op.ProductId = pt.Id
+                                            Where 1=1 ";
+                        if (completed == false)
+                        {
+                            cmd.CommandText += " AND o.PaymentTypeId IS NULL";
+                        }
+                        else
+                        {
+                            if (completed == true)
+                            {
+                                cmd.CommandText += " AND o.PaymentTypeId IS NOT NULL";
+                            }
+                        }
                         SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
                         Dictionary<int, Order> HashTable = new Dictionary<int, Order>();
@@ -131,84 +141,84 @@ namespace BangazonAPI.Controllers
 
                         return Ok(orders);
                     }
-                    else
-                    if (completed == false)
-                    {
+                    //else
+                    //if (completed == false)
+                    //{
 
-                        cmd.CommandText = @"SELECT o.Id, 
-                                            o.CustomerId,
-                                            o.PaymentTypeId
-                                    FROM [Order] o 
-                                    WHERE o.PaymentTypeId IS NULL";
+                    //    cmd.CommandText = @"SELECT o.Id, 
+                    //                        o.CustomerId,
+                    //                        o.PaymentTypeId
+                    //                FROM [Order] o 
+                    //                WHERE o.PaymentTypeId IS NULL";
 
-                        SqlDataReader reader = await cmd.ExecuteReaderAsync();
-
-
-                        List<Order> orders = new List<Order>();
-                        while (reader.Read())
-                        {
-                            orders.Add(new Order
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                                PaymentTypeId = reader.IsDBNull(reader.GetOrdinal("PaymentTypeId")) == true ? 0 : reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
-                                CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
-                            });
-                        }
-                        reader.Close();
-                        return Ok(orders);
-                    }
-                    else
-                    {
-                        if (completed == true)
-                        {
-
-                            cmd.CommandText = @"SELECT o.Id, 
-                                            o.CustomerId,
-                                            o.PaymentTypeId
-                                    FROM [Order] o 
-                                    WHERE o.PaymentTypeId IS NOT NULL";
-
-                            SqlDataReader reader = await cmd.ExecuteReaderAsync();
+                    //    SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
 
-                            List<Order> orders = new List<Order>();
-                            while (reader.Read())
-                            {
-                                orders.Add(new Order
-                                {
-                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                                    PaymentTypeId = reader.IsDBNull(reader.GetOrdinal("PaymentTypeId")) == true ? 0 : reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
-                                    CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
-                                });
-                            }
-                            reader.Close();
-                            return Ok(orders);
-                        }
+                    //    List<Order> orders = new List<Order>();
+                    //    while (reader.Read())
+                    //    {
+                    //        orders.Add(new Order
+                    //        {
+                    //            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                    //            PaymentTypeId = reader.IsDBNull(reader.GetOrdinal("PaymentTypeId")) == true ? 0 : reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
+                    //            CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
+                    //        });
+                    //    }
+                    //    reader.Close();
+                    //    return Ok(orders);
+                    //}
+                    //else
+                    //{
+                    //    if (completed == true)
+                    //    {
 
-                        else
-                        {
-                            cmd.CommandText = @"SELECT o.Id, 
-                                           o.CustomerId,
-                                           o.PaymentTypeId
-                                        FROM [Order] o";
+                    //        cmd.CommandText = @"SELECT o.Id, 
+                    //                        o.CustomerId,
+                    //                        o.PaymentTypeId
+                    //                FROM [Order] o 
+                    //                WHERE o.PaymentTypeId IS NOT NULL";
 
-                            SqlDataReader reader = await cmd.ExecuteReaderAsync();
+                    //        SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
 
-                            List<Order> orders = new List<Order>();
-                            while (reader.Read())
-                            {
-                                orders.Add(new Order
-                                {
-                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                                    PaymentTypeId = reader.IsDBNull(reader.GetOrdinal("PaymentTypeId")) == true ? 0 : reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
-                                    CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
-                                });
-                            }
-                            reader.Close();
-                            return Ok(orders);
-                        }
-                    }
+                    //        List<Order> orders = new List<Order>();
+                    //        while (reader.Read())
+                    //        {
+                    //            orders.Add(new Order
+                    //            {
+                    //                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                    //                PaymentTypeId = reader.IsDBNull(reader.GetOrdinal("PaymentTypeId")) == true ? 0 : reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
+                    //                CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
+                    //            });
+                    //        }
+                    //        reader.Close();
+                    //        return Ok(orders);
+                    //    }
+
+                    //    else
+                    //    {
+                    //        cmd.CommandText = @"SELECT o.Id, 
+                    //                       o.CustomerId,
+                    //                       o.PaymentTypeId
+                    //                    FROM [Order] o";
+
+                    //        SqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+
+                    //        List<Order> orders = new List<Order>();
+                    //        while (reader.Read())
+                    //        {
+                    //            orders.Add(new Order
+                    //            {
+                    //                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                    //                PaymentTypeId = reader.IsDBNull(reader.GetOrdinal("PaymentTypeId")) == true ? 0 : reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
+                    //                CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
+                    //            });
+                    //        }
+                    //        reader.Close();
+                    //        return Ok(orders);
+                    //    }
+                    
 
                 }
             }
