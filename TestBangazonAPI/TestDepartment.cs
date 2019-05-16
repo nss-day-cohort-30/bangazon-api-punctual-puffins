@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace TestBangazonAPI
 {
-    public class TestDepartment
+    public class TestPaym
     {
 
         [Fact]
